@@ -26,6 +26,10 @@ class ViewController: UIViewController {
         
         view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
+        NSLayoutConstraint.activate([
+            addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23)
+        ])
     }
 
     
