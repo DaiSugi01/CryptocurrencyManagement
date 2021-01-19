@@ -336,9 +336,21 @@ extension AddCurrencyViewController {
     }
         
     @objc func keyboardWasShown(_ notification: NSNotification) {
+        
+        guard let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+
+        let keyboardFrame = keyboardFrameValue.cgRectValue
+        let keyboardHeight = keyboardFrame.size.height
+
+        let insets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardHeight, right: 0)
+        scrollView.contentInset = insets
+        scrollView.scrollIndicatorInsets = insets
     }
-    
+
     @objc func keyboardWillBeHidden(_ notification: NSNotification) {
+        let insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        scrollView.contentInset = insets
+        scrollView.scrollIndicatorInsets = insets
     }
     
     @objc func selectedTF(_ sender: UITextField) {
