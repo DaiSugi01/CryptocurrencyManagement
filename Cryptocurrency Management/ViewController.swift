@@ -19,14 +19,6 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
-
-    let addCurrencyButton: UIButton = {
-        let bt = UIButton()
-        bt.translatesAutoresizingMaskIntoConstraints = false
-        bt.setTitle("Add Currency", for: .normal)
-        bt.addTarget(self, action: #selector(addCurrencyTapped(_:)), for: .touchUpInside)
-        return bt
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
