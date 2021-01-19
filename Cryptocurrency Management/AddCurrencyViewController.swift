@@ -260,6 +260,9 @@ class AddCurrencyViewController: UIViewController {
 
         currencyPicker.delegate = self as UIPickerViewDelegate
         currencyPicker.dataSource = self as UIPickerViewDataSource
+        
+        lowPriceTF.delegate = self
+        highPriceTF.delegate = self
     }
     
     private func setupUI() {
@@ -280,8 +283,6 @@ class AddCurrencyViewController: UIViewController {
         contentSV.addArrangedSubview(currencyWrapper)
         contentSV.addArrangedSubview(alertWrapper)
         contentSV.addArrangedSubview(realTimeRateWrapper)
-//        contentSV.addArrangedSubview(realTimeRateSV)
-//        contentSV.addArrangedSubview(currencyChart)
 
         // add items into currency wrapper stack view
         currencyWrapper.addArrangedSubview(currencySV)
@@ -317,32 +318,29 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func setConstraints() {
-        
-        /* set constraints */
-        // set header stack view constraints
+        /* header */
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
         headerSV.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 30).isActive = true
         headerSV.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -30).isActive = true
         
         /* scroll view */
-        // set contents scroll view constraints
         scrollView.topAnchor.constraint(equalTo: headerSV.bottomAnchor, constant: 70).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        /* contents stack view **/
-        // set contents stack view constraints
         contentSV.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor).isActive = true
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
         contentSV.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor).isActive = true
         contentSV.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor).isActive = true
 
+        /* currency area */
         currencyWrapper.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
         currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
 
+        /* alert area */
         alertWrapper.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         alertWrapper.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
         alertWrapper.heightAnchor.constraint(equalToConstant: 190).isActive = true
@@ -361,6 +359,7 @@ class AddCurrencyViewController: UIViewController {
         highPriceTF.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
         highPriceTF.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
+        /* real time rate area */
         realTimeRateSV.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         realTimeRateSV.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
 
@@ -369,14 +368,41 @@ class AddCurrencyViewController: UIViewController {
         currencyChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
-    private func isEnableSaveButton(buttonTitle: String) -> Bool{
-        return buttonTitle != ""
+    private func isEnableSaveButton() -> Bool{
+        var isTextFieldValidPass = true
+        if lowPriceTF.text != "" || highPriceTF.text != "" {
+            isTextFieldValidPass = isTextFieldValid()
+        }
+        guard let selectedCurrencyName = currencyNameButton.currentTitle else { return false }
+        return selectedCurrencyName != "" && isTextFieldValidPass
+    }
+    
+    private func isTextFieldValid() -> Bool {
+        if lowPriceTF.text != "" {
+            guard let _ = Double(lowPriceTF.text!) else { return false }
+        }
+
+        if highPriceTF.text != "" {
+            guard let _ = Double(highPriceTF.text!) else { return false }
+        }
+
+        return true
     }
     
     private func hiddenPicker() {
         if currencyPicker.isHidden { return }
         UIView.animate(withDuration: 0.1) {
             self.currencyPicker.isHidden = true
+        }
+    }
+    
+    private func enableSaveButton() {
+        if isEnableSaveButton() {
+            saveButton.isEnabled = true
+            saveButton.setTitleColor(UIColor(hex: "007AFF"), for: .normal)
+        } else {
+            saveButton.isEnabled = false
+            saveButton.setTitleColor(.lightGray, for: .normal)
         }
     }
 }
@@ -440,14 +466,13 @@ extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        let selectedCurrency = currencies[row]
-        currencyNameButton.setTitle(selectedCurrency, for: .normal)
-        if isEnableSaveButton(buttonTitle: selectedCurrency) {
-            saveButton.isEnabled = true
-            saveButton.setTitleColor(UIColor(hex: "007AFF"), for: .normal)
-        } else {
-            saveButton.isEnabled = false
-            saveButton.setTitleColor(.lightGray, for: .normal)
-        }
+        currencyNameButton.setTitle(currencies[row], for: .normal)
+        enableSaveButton()
+    }
+}
+
+extension AddCurrencyViewController: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        enableSaveButton()
     }
 }
