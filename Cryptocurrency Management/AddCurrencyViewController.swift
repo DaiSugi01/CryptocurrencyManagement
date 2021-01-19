@@ -224,6 +224,13 @@ class AddCurrencyViewController: UIViewController {
         return lb
     }()
     
+    let currencyChart: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        v.backgroundColor = .green
+        return v
+    }()
+    
     let currencies = ["", "BTC", "ETH", "XRP", "German", "Science", "Japanese", "French"]
     var isPickerHidden = true
     
@@ -262,6 +269,7 @@ class AddCurrencyViewController: UIViewController {
         contentSV.addArrangedSubview(alertLabel)
         contentSV.addArrangedSubview(alertSV)
         contentSV.addArrangedSubview(realTimeRateSV)
+        contentSV.addArrangedSubview(currencyChart)
 
         currencyWrapper.addArrangedSubview(currencySV)
         currencyWrapper.addArrangedSubview(currencyPicker)
@@ -300,7 +308,7 @@ class AddCurrencyViewController: UIViewController {
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
         contentSV.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor).isActive = true
         contentSV.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor).isActive = true
-        
+
         lowPriceTF.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
         lowPriceTF.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
@@ -310,9 +318,9 @@ class AddCurrencyViewController: UIViewController {
         currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
 
-        print(scrollView.bounds.size.width)
-//        let alertLabel = UILabel(frame: .init(x: alertSV.bounds., y: <#T##Int#>, width: <#T##Int#>, height: <#T##Int#>))
-//        contentSV.addArrangedSubview(alertLabel)
+        currencyChart.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
+        currencyChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
+        currencyChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 
     }
     
