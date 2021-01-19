@@ -71,6 +71,7 @@ class AddCurrencyViewController: UIViewController {
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
         sv.distribution = .fill
+        sv.spacing = 10
         sv.isLayoutMarginsRelativeArrangement = true
         sv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
         return sv
@@ -111,6 +112,15 @@ class AddCurrencyViewController: UIViewController {
         pv.backgroundColor = .white
         pv.isHidden = true
         return pv
+    }()
+
+    let alertLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.text = "Set the Alert (optional)"
+        lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
+        lb.textColor = UIColor(hex: "858EC5")
+        return lb
     }()
     
     let alertSV: UIStackView = {
@@ -186,6 +196,34 @@ class AddCurrencyViewController: UIViewController {
         return tf
     }()
     
+    let realTimeRateSV: UIStackView = {
+        let sv = UIStackView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.distribution = .fill
+        sv.spacing = 10
+        return sv
+    }()
+    
+    let realTimeRateLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.text = "Real time rate: "
+        lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
+        lb.setContentHuggingPriority(.required, for: .horizontal)
+        lb.textColor = UIColor(hex: "858EC5")
+        return lb
+    }()
+    
+    let realTimeRate: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.text = "$ 45,970.94"
+        lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
+        lb.textColor = UIColor(hex: "1DC7AC")
+        return lb
+    }()
+    
     let currencies = ["", "BTC", "ETH", "XRP", "German", "Science", "Japanese", "French"]
     var isPickerHidden = true
     
@@ -221,13 +259,15 @@ class AddCurrencyViewController: UIViewController {
         scrollView.addSubview(contentSV)
         // add label and textField to stack view
         contentSV.addArrangedSubview(currencyWrapper)
+        contentSV.addArrangedSubview(alertLabel)
+        contentSV.addArrangedSubview(alertSV)
+        contentSV.addArrangedSubview(realTimeRateSV)
+
         currencyWrapper.addArrangedSubview(currencySV)
+        currencyWrapper.addArrangedSubview(currencyPicker)
         // add label and textField to stack view
         currencySV.addArrangedSubview(currencyLabel)
         currencySV.addArrangedSubview(currencyNameButton)
-        currencyWrapper.addArrangedSubview(currencyPicker)
-
-        contentSV.addArrangedSubview(alertSV)
 
         alertSV.addArrangedSubview(lowPriceSV)
         alertSV.addArrangedSubview(highPriceSV)
@@ -238,6 +278,9 @@ class AddCurrencyViewController: UIViewController {
         highPriceSV.addArrangedSubview(highPriceLabel)
         highPriceSV.addArrangedSubview(highPriceTF)
 
+        realTimeRateSV.addArrangedSubview(realTimeRateLabel)
+        realTimeRateSV.addArrangedSubview(realTimeRate)
+        
         /* header stack view**/
         // set header stack view constraints
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
@@ -267,8 +310,7 @@ class AddCurrencyViewController: UIViewController {
         currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
 
-        print(alertSV.frame.origin.x)
-        print(alertSV.frame.origin.y)
+        print(scrollView.bounds.size.width)
 //        let alertLabel = UILabel(frame: .init(x: alertSV.bounds., y: <#T##Int#>, width: <#T##Int#>, height: <#T##Int#>))
 //        contentSV.addArrangedSubview(alertLabel)
 
@@ -338,7 +380,7 @@ extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSourc
         currencyNameButton.setTitle(selectedCurrency, for: .normal)
         if isEnableSaveButton(buttonTitle: selectedCurrency) {
             saveButton.isEnabled = true
-            saveButton.setTitleColor(.blue, for: .normal)
+            saveButton.setTitleColor(UIColor(hex: "007AFF"), for: .normal)
         } else {
             saveButton.isEnabled = false
             saveButton.setTitleColor(.lightGray, for: .normal)
