@@ -2,7 +2,7 @@
 //  AddCurrencyViewController.swift
 //  Cryptocurrency Management
 //
-//  Created by 杉原大貴 on 2021/01/18.
+//  Created by Yuki Tsukada on 2021/01/19.
 //
 
 import UIKit

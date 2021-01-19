@@ -8,6 +8,17 @@
 import UIKit
 
 class ViewController: UIViewController {
+    let addCurrencyButton: UIButton = {
+        let bt = UIButton()
+        bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.setTitle("Add Currency", for: .normal)
+        bt.setTitleColor(UIColor(hex: "#426DDC"), for: .normal)
+        bt.titleLabel?.font = UIFont(name: "HelveticaNeueCyr", size: 14)
+        bt.frame = CGRect(x: 261, y: 76, width: 120, height: 36)
+        bt.backgroundColor = UIColor(hex: "#212A6B", alpha: 1.0)
+        bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
+        return bt
+    }()
 
     let addCurrencyButton: UIButton = {
         let bt = UIButton()
@@ -19,14 +30,19 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
-        addCurrencyButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        addCurrencyButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23)
+        ])
     }
 
-    @objc func addCurrencyTapped(_ semder: UIButton) {
-        let addCurrencyVC = AddCurrencyViewController()
-        present(addCurrencyVC, animated: true, completion: nil)
+    
+    @objc func addCurrencyButtonTapped(_ sender: UIButton) {
+        let nextView = AddCurrencyViewController()
+        nextView.modalTransitionStyle = .coverVertical
+        present(nextView, animated: true, completion: nil)
     }
 
 }
