@@ -73,16 +73,15 @@ class AddCurrencyViewController: UIViewController {
         sv.distribution = .fill
         sv.spacing = 10
         sv.isLayoutMarginsRelativeArrangement = true
-        sv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+        sv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 20)
         return sv
     }()
-    
+
     let currencySV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.spacing = 50
         return sv
     }()
     
@@ -113,16 +112,23 @@ class AddCurrencyViewController: UIViewController {
         pv.isHidden = true
         return pv
     }()
-
+    
+    let alertWrapper: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    
     let alertLabel: UILabel = {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.backgroundColor = UIColor(hex: "10194E")
         lb.text = "Set the Alert (optional)"
         lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
         lb.textColor = UIColor(hex: "858EC5")
         return lb
     }()
-    
+
     let alertSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -141,14 +147,12 @@ class AddCurrencyViewController: UIViewController {
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.spacing = 50
         return sv
     }()
     
     let lowPriceLabel: UILabel = {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.setContentHuggingPriority(.required, for: .horizontal)
         lb.text = "Low Price"
         lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
         lb.textColor = UIColor(hex: "858EC5")
@@ -171,14 +175,12 @@ class AddCurrencyViewController: UIViewController {
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.distribution = .fill
-        sv.spacing = 50
         return sv
     }()
     
     let highPriceLabel: UILabel = {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.setContentHuggingPriority(.required, for: .horizontal)
         lb.text = "High Price"
         lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
         lb.textColor = UIColor(hex: "858EC5")
@@ -194,6 +196,15 @@ class AddCurrencyViewController: UIViewController {
         tf.backgroundColor = .white
         tf.layer.cornerRadius = 5.0
         return tf
+    }()
+    
+    let realTimeRateWrapper: UIStackView = {
+        let sv = UIStackView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .vertical
+        sv.distribution = .equalSpacing
+        sv.spacing = 10
+        return sv
     }()
     
     let realTimeRateSV: UIStackView = {
@@ -240,7 +251,6 @@ class AddCurrencyViewController: UIViewController {
         setupUI()
     }
     
-
     private func setDelegates() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillBeHidden(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -255,41 +265,60 @@ class AddCurrencyViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = UIColor(hex: "10194E")
 
-        view.addSubview(scrollView)
+        /* add item to views */
         view.addSubview(headerSV)
-        scrollView.addSubview(contentSV)
+        view.addSubview(scrollView)
         // add items into header stack view
         headerSV.addArrangedSubview(cancelButton)
         headerSV.addArrangedSubview(pageTitleLabel)
         headerSV.addArrangedSubview(saveButton)
-        // add contents into scroll view
+        
+        // add stack view into scroll view
         scrollView.addSubview(contentSV)
-        // add label and textField to stack view
-        contentSV.addArrangedSubview(currencyWrapper)
-        contentSV.addArrangedSubview(alertLabel)
-        contentSV.addArrangedSubview(alertSV)
-        contentSV.addArrangedSubview(realTimeRateSV)
-        contentSV.addArrangedSubview(currencyChart)
 
+        // add items into content stack view
+        contentSV.addArrangedSubview(currencyWrapper)
+        contentSV.addArrangedSubview(alertWrapper)
+        contentSV.addArrangedSubview(realTimeRateWrapper)
+//        contentSV.addArrangedSubview(realTimeRateSV)
+//        contentSV.addArrangedSubview(currencyChart)
+
+        // add items into currency wrapper stack view
         currencyWrapper.addArrangedSubview(currencySV)
         currencyWrapper.addArrangedSubview(currencyPicker)
-        // add label and textField to stack view
+
+        // add items into currency stack view
         currencySV.addArrangedSubview(currencyLabel)
         currencySV.addArrangedSubview(currencyNameButton)
 
+        alertWrapper.addSubview(alertSV)
+        alertWrapper.addSubview(alertLabel)
+
+        // add items into alert stack view
         alertSV.addArrangedSubview(lowPriceSV)
         alertSV.addArrangedSubview(highPriceSV)
 
+        // add items into low price stack view
         lowPriceSV.addArrangedSubview(lowPriceLabel)
         lowPriceSV.addArrangedSubview(lowPriceTF)
-        
+
+        // add items into high price stack view
         highPriceSV.addArrangedSubview(highPriceLabel)
         highPriceSV.addArrangedSubview(highPriceTF)
+
+        // add items into real time rate stack view
+        realTimeRateWrapper.addArrangedSubview(realTimeRateSV)
+        realTimeRateWrapper.addArrangedSubview(currencyChart)
 
         realTimeRateSV.addArrangedSubview(realTimeRateLabel)
         realTimeRateSV.addArrangedSubview(realTimeRate)
         
-        /* header stack view**/
+        setConstraints()
+    }
+    
+    private func setConstraints() {
+        
+        /* set constraints */
         // set header stack view constraints
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
         headerSV.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 30).isActive = true
@@ -298,16 +327,33 @@ class AddCurrencyViewController: UIViewController {
         /* scroll view */
         // set contents scroll view constraints
         scrollView.topAnchor.constraint(equalTo: headerSV.bottomAnchor, constant: 70).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20).isActive = true
+        scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
-        /* contents stack view**/
+        /* contents stack view **/
         // set contents stack view constraints
         contentSV.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor).isActive = true
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
         contentSV.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor).isActive = true
         contentSV.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor).isActive = true
+
+        currencyWrapper.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        
+        currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
+
+        alertWrapper.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        alertWrapper.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
+        alertWrapper.heightAnchor.constraint(equalToConstant: 190).isActive = true
+
+        alertLabel.topAnchor.constraint(equalTo: alertWrapper.topAnchor).isActive = true
+        alertLabel.leadingAnchor.constraint(equalTo: alertWrapper.leadingAnchor, constant: 5).isActive = true
+
+        alertSV.topAnchor.constraint(equalTo: alertWrapper.topAnchor, constant: 10).isActive = true
+        alertSV.bottomAnchor.constraint(equalTo: alertWrapper.bottomAnchor).isActive = true
+        alertSV.leadingAnchor.constraint(equalTo: alertWrapper.leadingAnchor).isActive = true
+        alertSV.trailingAnchor.constraint(equalTo: alertWrapper.trailingAnchor).isActive = true
 
         lowPriceTF.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
         lowPriceTF.heightAnchor.constraint(equalToConstant: 40).isActive = true
@@ -315,13 +361,12 @@ class AddCurrencyViewController: UIViewController {
         highPriceTF.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
         highPriceTF.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
-        currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
+        realTimeRateSV.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        realTimeRateSV.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
 
         currencyChart.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
         currencyChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
         currencyChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
     }
     
     private func isEnableSaveButton(buttonTitle: String) -> Bool{
@@ -329,10 +374,9 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func hiddenPicker() {
-        if !currencyPicker.isHidden {
-            UIView.animate(withDuration: 0.1) {
-                self.currencyPicker.isHidden = true
-            }
+        if currencyPicker.isHidden { return }
+        UIView.animate(withDuration: 0.1) {
+            self.currencyPicker.isHidden = true
         }
     }
 }
