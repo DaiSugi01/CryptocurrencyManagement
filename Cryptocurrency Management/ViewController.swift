@@ -19,10 +19,9 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
         NSLayoutConstraint.activate([
@@ -36,7 +35,6 @@ class ViewController: UIViewController {
         let nextView = AddCurrencyViewController()
         nextView.modalTransitionStyle = .coverVertical
         present(nextView, animated: true, completion: nil)
-
     }
 
 }
