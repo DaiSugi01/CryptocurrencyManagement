@@ -30,6 +30,14 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
+    let tableViewSwitchButton: UIButton = {
+        let bt = UIButton()
+        bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.layer.cornerRadius = bt.frame.height * 0.50
+        bt.backgroundColor = UIColor(hex: "#212A6B")
+        bt.addTarget(self, action: #selector(tableViewSwitchButtonTapped(_:)), for: .touchUpInside)
+        return bt
+    }()
     let cellId = "currencyCellId"
     private var currentState: State = .closed
     private lazy var popupView: UIView = {
@@ -50,9 +58,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 //        view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
+        view.addSubview(tableViewSwitchButton)
         NSLayoutConstraint.activate([
             addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
-            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23)
+            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
+            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16)
         ])
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
         currencyTableView.delegate = self
@@ -65,6 +76,36 @@ class ViewController: UIViewController {
         let nextView = AddCurrencyViewController()
         nextView.modalTransitionStyle = .coverVertical
         present(nextView, animated: true, completion: nil)
+    }
+    
+    @objc func tableViewSwitchButtonTapped(_ sender: UIButton) {
+        let state = currentState.opposite
+        let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
+            switch state {
+            case .open:
+                self.bottomConstraint.constant = self.view.frame.height * 0.9
+            case .closed:
+                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
+            }
+            self.view.layoutIfNeeded()
+        })
+        transitionAnimator.addCompletion { position in
+            switch position {
+            case .start:
+                self.currentState = state.opposite
+            case .end:
+                self.currentState = state
+            case .current:
+                ()
+            }
+            switch self.currentState {
+            case .open:
+                self.bottomConstraint.constant = self.view.frame.height * 0.9
+            case .closed:
+                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
+            }
+        }
+        transitionAnimator.startAnimation()
     }
     
     private var bottomConstraint = NSLayoutConstraint()
