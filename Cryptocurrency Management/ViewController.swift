@@ -230,11 +230,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
+        let cell = UITableViewCell(style: .value1 , reuseIdentifier: cellId)
         cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "192259") : UIColor(hex: "10194E")
         cell.textLabel?.textColor = UIColor(hex: "858EC5")
         cell.textLabel?.text = registeredCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
+        cell.detailTextLabel?.text = "$\(registeredCurrencies[indexPath.row].price)"
+        cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
         return cell
     }
     
