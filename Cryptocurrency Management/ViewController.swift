@@ -45,6 +45,7 @@ class ViewController: UIViewController {
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.setTitle("Edit", for: .normal)
         bt.setTitleColor(UIColor(hex: "#007AFF"), for: .normal)
+        bt.addTarget(self, action: #selector(editButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
     let allCurrencyLabel: UILabel = {
@@ -68,6 +69,12 @@ class ViewController: UIViewController {
         tv.backgroundColor = .gray
         return tv
     }()
+    var selectedCurrencies: [Cryptocurrency] =
+            [Cryptocurrency(name: "Bitcoin", price: 45497.94),
+             Cryptocurrency(name: "Ethereum", price: 1408.84),
+             Cryptocurrency(name: "Ripple", price: 0.301),
+             Cryptocurrency(name: "Litecoin", price: 180.64)]
+    
     
     override func viewDidLoad() {
         view.backgroundColor = .white
@@ -92,6 +99,7 @@ class ViewController: UIViewController {
             allCurrencyLabel.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 18)
         ])
         
+
     }
 
     
@@ -131,6 +139,12 @@ class ViewController: UIViewController {
         transitionAnimator.startAnimation()
     }
     
+    @objc func editButtonTapped(_ sender: UIButton) {
+        // require UIBarButtonItem, navigationbar
+//        let tableViewEditingMode = tableView.isEditing
+//        tableView.setEditing(!tableViewEditingMode, animated: true)
+    }
+    
     private var bottomConstraint = NSLayoutConstraint()
     private func layout() {
         view.backgroundColor = UIColor(hex: "10194E")
@@ -161,13 +175,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
         cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "192259") : UIColor(hex: "10194E")
         cell.textLabel?.textColor = UIColor(hex: "858EC5")
-        cell.textLabel?.text = "TEST Label"
+        cell.textLabel?.text = selectedCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 30
+        return selectedCurrencies.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -202,5 +216,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             }
         }
         transitionAnimator.startAnimation()
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            selectedCurrencies.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .bottom)
+        }
     }
 }
