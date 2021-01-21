@@ -5,6 +5,7 @@
 //  Created by 杉原大貴 on 2021/01/17.
 //
 import UIKit
+
 private enum State {
     case closed
     case open
@@ -24,8 +25,9 @@ class ViewController: UIViewController {
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.setTitle("Add Currency", for: .normal)
         bt.setTitleColor(UIColor(hex: "#426DDC"), for: .normal)
-        bt.titleLabel?.font = UIFont(name: "HelveticaNeueCyr", size: 14)
+        bt.titleLabel?.font = UIFont.systemFont(ofSize: 14)
         bt.frame = CGRect(x: 261, y: 76, width: 120, height: 36)
+        bt.layer.cornerRadius = bt.frame.height * 0.10
         bt.backgroundColor = UIColor(hex: "#212A6B", alpha: 1.0)
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
@@ -33,8 +35,10 @@ class ViewController: UIViewController {
     let tableViewSwitchButton: UIButton = {
         let bt = UIButton()
         bt.translatesAutoresizingMaskIntoConstraints = false
-        bt.setTitle("Switch", for: .normal)
+        bt.setTitle("＝", for: .normal)
+        bt.titleLabel?.font = UIFont.systemFont(ofSize: 40)
         bt.setTitleColor(UIColor(hex: "#FF2E63"), for: .normal)
+        bt.frame = CGRect(x: 16, y: 76, width: 48, height: 48)
         bt.layer.cornerRadius = bt.frame.height * 0.50
         bt.backgroundColor = UIColor(hex: "#212A6B")
         bt.addTarget(self, action: #selector(tableViewSwitchButtonTapped(_:)), for: .touchUpInside)
@@ -114,9 +118,8 @@ class ViewController: UIViewController {
     
     
     override func viewDidLoad() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(hex: "#010A43")
         super.viewDidLoad()
-//        view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
         view.addSubview(tableViewSwitchButton)
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
@@ -130,8 +133,11 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activate([
             addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
             addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
-            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            addCurrencyButton.heightAnchor.constraint(equalToConstant: 36),
+            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 74),
             tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            tableViewSwitchButton.heightAnchor.constraint(equalToConstant: 48),
+            tableViewSwitchButton.widthAnchor.constraint(equalToConstant: 48),
             editButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
             editButton.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -24),
             deleteButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
@@ -139,9 +145,7 @@ class ViewController: UIViewController {
             allCurrencyLabel.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 28),
             allCurrencyLabel.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 18)
         ])
-
     }
-
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
         let nextView = AddCurrencyViewController()
@@ -150,54 +154,29 @@ class ViewController: UIViewController {
     }
     
     @objc func tableViewSwitchButtonTapped(_ sender: UIButton) {
-        let state = currentState.opposite
-        let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
-            switch state {
-            case .open:
-                self.bottomConstraint.constant = self.view.frame.height * 0.9
-            case .closed:
-                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
-            }
-            self.view.layoutIfNeeded()
-        })
-        transitionAnimator.addCompletion { position in
-            switch position {
-            case .start:
-                self.currentState = state.opposite
-            case .end:
-                self.currentState = state
-            case .current:
-                ()
-            }
-            switch self.currentState {
-            case .open:
-                self.bottomConstraint.constant = self.view.frame.height * 0.9
-            case .closed:
-                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
-            }
-        }
-        transitionAnimator.startAnimation()
+        switchTableViewDisplay()
     }
     
     @objc func editButtonTapped(_ sender: UIButton) {
+        // allow multiple selection
         currencyTableView.allowsMultipleSelection = true
         currencyTableView.allowsMultipleSelectionDuringEditing = true
-        let tableViewEditingMode = currencyTableView.isEditing
+        let tableViewEditingMode = currencyTableView.isEditing  // false during editing mode (strange)
         currencyTableView.setEditing(!tableViewEditingMode, animated: true)
+        // disable modal dismissal during editing
         allowDissmissModal = tableViewEditingMode
+        // show delete button during editing
         deleteButton.isHidden = tableViewEditingMode
-        print("tableViewEditingMode is \(tableViewEditingMode)")  // false during editing mode (strange)
-        print("allowDissmissModal is \(allowDissmissModal)")
         if tableViewEditingMode == true {
             selectedRows.removeAll()
         }
     }
     
+    // multiple deletion
     @objc func deleteButtonTapped(_ sender: UIButton) {
         let sortedSelectedRows = selectedRows.sorted { $0 > $1 }
-        print(sortedSelectedRows)
-        for indexPathList in sortedSelectedRows {
-            registeredCurrencies.remove(at: indexPathList)
+        for eachRow in sortedSelectedRows {
+            registeredCurrencies.remove(at: eachRow)
         }
         selectedRows.removeAll()
         currencyTableView.reloadData()
@@ -205,18 +184,20 @@ class ViewController: UIViewController {
     
     private var bottomConstraint = NSLayoutConstraint()
     private func layout() {
-        view.backgroundColor = UIColor(hex: "10194E")
+        view.backgroundColor = UIColor(hex: "#010A43")
         popupView.translatesAutoresizingMaskIntoConstraints = false
+        popupView.backgroundColor = UIColor(hex: "#10194E")
         view.addSubview(popupView)
         popupView.addSubview(currencyTableView)
+        currencyTableView.backgroundColor = UIColor(hex: "#10194E")
         
         popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2).isActive = true
         popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2).isActive = true
-        bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.3) // view.frame.size.height * 0.3
+        bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.05)
         bottomConstraint.isActive = true
-        popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.9).isActive = true
+        popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6).isActive = true
         
-        currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, multiplier: 0.9).isActive = true
+        currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, constant: -60).isActive = true
         currencyTableView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor).isActive = true
         currencyTableView.leadingAnchor.constraint(equalTo: popupView.leadingAnchor).isActive = true
         currencyTableView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor).isActive = true
@@ -231,11 +212,11 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .value1 , reuseIdentifier: cellId)
-        cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "192259") : UIColor(hex: "10194E")
-        cell.textLabel?.textColor = UIColor(hex: "858EC5")
+        cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "#192259") : UIColor(hex: "#10194E")
+        cell.textLabel?.textColor = UIColor(hex: "#858EC5")
         cell.textLabel?.text = registeredCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
-        cell.detailTextLabel?.text = "$\(registeredCurrencies[indexPath.row].price)"
+        cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].price)"
         cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
         return cell
     }
@@ -249,46 +230,51 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let state = currentState.opposite
-        print("allowDissmissModal is \(allowDissmissModal)")
         if allowDissmissModal == true {
-            let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
-                switch state {
-                case .open:
-                    self.bottomConstraint.constant = self.view.frame.height * 0.9
-                case .closed:
-                    self.bottomConstraint.constant = self.view.frame.size.height * 0.4
-                }
-                self.view.layoutIfNeeded()
-            })
-            transitionAnimator.addCompletion { position in
-                switch position {
-                case .start:
-                    self.currentState = state.opposite
-                case .end:
-                    self.currentState = state
-                case .current:
-                    ()
-                }
-                switch self.currentState {
-                case .open:
-                    self.bottomConstraint.constant = self.view.frame.height * 0.9
-                case .closed:
-                    self.bottomConstraint.constant = self.view.frame.size.height * 0.4
-                }
-            }
-            transitionAnimator.startAnimation()
+            switchTableViewDisplay()
         } else {
             selectedRows.append(indexPath.row)
-            print("selectedRows are \(selectedRows)")
         }
-        
     }
     
+    // swipe delete
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             registeredCurrencies.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .bottom)
+            // for update cell.backgroundColor
+            tableView.reloadData()
         }
+    }
+    
+    // table view modal dismissal and reappearance
+    private func switchTableViewDisplay() {
+        let state = currentState.opposite
+        let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
+            switch state {
+            case .open:
+                self.bottomConstraint.constant = self.view.frame.height * 0.95
+            case .closed:
+                self.bottomConstraint.constant = self.view.frame.size.height * 0.05
+            }
+            self.view.layoutIfNeeded()
+        })
+        transitionAnimator.addCompletion { position in
+            switch position {
+            case .start:
+                self.currentState = state.opposite
+            case .end:
+                self.currentState = state
+            case .current:
+                ()
+            }
+            switch self.currentState {
+            case .open:
+                self.bottomConstraint.constant = self.view.frame.height * 0.95
+            case .closed:
+                self.bottomConstraint.constant = self.view.frame.size.height * 0.05
+            }
+        }
+        transitionAnimator.startAnimation()
     }
 }
