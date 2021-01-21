@@ -33,10 +33,26 @@ class ViewController: UIViewController {
     let tableViewSwitchButton: UIButton = {
         let bt = UIButton()
         bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.setTitle("Switch", for: .normal)
+        bt.setTitleColor(UIColor(hex: "#FF2E63"), for: .normal)
         bt.layer.cornerRadius = bt.frame.height * 0.50
         bt.backgroundColor = UIColor(hex: "#212A6B")
         bt.addTarget(self, action: #selector(tableViewSwitchButtonTapped(_:)), for: .touchUpInside)
         return bt
+    }()
+    let editButton: UIButton = {
+        let bt = UIButton()
+        bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.setTitle("Edit", for: .normal)
+        bt.setTitleColor(UIColor(hex: "#007AFF"), for: .normal)
+        return bt
+    }()
+    let allCurrencyLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.text = "All Currencies"
+        lb.textColor = UIColor(hex: "#FFFFFF")
+        return lb
     }()
     let cellId = "currencyCellId"
     private var currentState: State = .closed
@@ -59,16 +75,23 @@ class ViewController: UIViewController {
 //        view.backgroundColor = UIColor(hex: "#010A43")
         view.addSubview(addCurrencyButton)
         view.addSubview(tableViewSwitchButton)
-        NSLayoutConstraint.activate([
-            addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
-            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
-            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
-            tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16)
-        ])
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
         currencyTableView.delegate = self
         currencyTableView.dataSource = self
         layout()
+        popupView.addSubview(editButton)
+        popupView.addSubview(allCurrencyLabel)
+        NSLayoutConstraint.activate([
+            addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
+            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
+            tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            editButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
+            editButton.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -24),
+            allCurrencyLabel.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 28),
+            allCurrencyLabel.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 18)
+        ])
+        
     }
 
     
