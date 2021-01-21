@@ -48,6 +48,14 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(editButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
+    let deleteButton: UIButton = {
+        let bt = UIButton()
+        bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.setTitle("Delete", for: .normal)
+        bt.setTitleColor(UIColor(hex: "#fc0303"), for: .normal)
+        bt.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
+        return bt
+    }()
     let allCurrencyLabel: UILabel = {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
@@ -69,11 +77,40 @@ class ViewController: UIViewController {
         tv.backgroundColor = .gray
         return tv
     }()
-    var selectedCurrencies: [Cryptocurrency] =
+    var registeredCurrencies: [Cryptocurrency] =
             [Cryptocurrency(name: "Bitcoin", price: 45497.94),
              Cryptocurrency(name: "Ethereum", price: 1408.84),
              Cryptocurrency(name: "Ripple", price: 0.301),
-             Cryptocurrency(name: "Litecoin", price: 180.64)]
+             Cryptocurrency(name: "Litecoin", price: 180.64),
+             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
+             Cryptocurrency(name: "Stellar", price: 0.29),
+             Cryptocurrency(name: "EOS", price: 2.73),
+             Cryptocurrency(name: "Tezos", price: 2.75),
+             Cryptocurrency(name: "Dash", price: 113.29),
+             Cryptocurrency(name: "Ethereum Classic", price: 7.75),
+             Cryptocurrency(name: "Bitcoin", price: 45497.94),
+             Cryptocurrency(name: "Ethereum", price: 1408.84),
+             Cryptocurrency(name: "Ripple", price: 0.301),
+             Cryptocurrency(name: "Litecoin", price: 180.64),
+             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
+             Cryptocurrency(name: "Stellar", price: 0.29),
+             Cryptocurrency(name: "EOS", price: 2.73),
+             Cryptocurrency(name: "Tezos", price: 2.75),
+             Cryptocurrency(name: "Dash", price: 113.29),
+             Cryptocurrency(name: "Ethereum Classic", price: 7.75),
+             Cryptocurrency(name: "Bitcoin", price: 45497.94),
+             Cryptocurrency(name: "Ethereum", price: 1408.84),
+             Cryptocurrency(name: "Ripple", price: 0.301),
+             Cryptocurrency(name: "Litecoin", price: 180.64),
+             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
+             Cryptocurrency(name: "Stellar", price: 0.29),
+             Cryptocurrency(name: "EOS", price: 2.73),
+             Cryptocurrency(name: "Tezos", price: 2.75),
+             Cryptocurrency(name: "Dash", price: 113.29),
+             Cryptocurrency(name: "Ethereum Classic", price: 7.75)]
+    var allowDissmissModal = true
+    var selectedRows: [Int] = []
+    
     
     
     override func viewDidLoad() {
@@ -87,6 +124,8 @@ class ViewController: UIViewController {
         currencyTableView.dataSource = self
         layout()
         popupView.addSubview(editButton)
+        popupView.addSubview(deleteButton)
+        deleteButton.isHidden = true
         popupView.addSubview(allCurrencyLabel)
         NSLayoutConstraint.activate([
             addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
@@ -95,10 +134,11 @@ class ViewController: UIViewController {
             tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             editButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
             editButton.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -24),
+            deleteButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
+            deleteButton.trailingAnchor.constraint(equalTo: editButton.leadingAnchor, constant: -10),
             allCurrencyLabel.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 28),
             allCurrencyLabel.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 18)
         ])
-        
 
     }
 
@@ -140,9 +180,27 @@ class ViewController: UIViewController {
     }
     
     @objc func editButtonTapped(_ sender: UIButton) {
-        // require UIBarButtonItem, navigationbar
-//        let tableViewEditingMode = tableView.isEditing
-//        tableView.setEditing(!tableViewEditingMode, animated: true)
+        currencyTableView.allowsMultipleSelection = true
+        currencyTableView.allowsMultipleSelectionDuringEditing = true
+        let tableViewEditingMode = currencyTableView.isEditing
+        currencyTableView.setEditing(!tableViewEditingMode, animated: true)
+        allowDissmissModal = tableViewEditingMode
+        deleteButton.isHidden = tableViewEditingMode
+        print("tableViewEditingMode is \(tableViewEditingMode)")  // false during editing mode (strange)
+        print("allowDissmissModal is \(allowDissmissModal)")
+        if tableViewEditingMode == true {
+            selectedRows.removeAll()
+        }
+    }
+    
+    @objc func deleteButtonTapped(_ sender: UIButton) {
+        let sortedSelectedRows = selectedRows.sorted { $0 > $1 }
+        print(sortedSelectedRows)
+        for indexPathList in sortedSelectedRows {
+            registeredCurrencies.remove(at: indexPathList)
+        }
+        selectedRows.removeAll()
+        currencyTableView.reloadData()
     }
     
     private var bottomConstraint = NSLayoutConstraint()
@@ -154,7 +212,7 @@ class ViewController: UIViewController {
         
         popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2).isActive = true
         popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2).isActive = true
-        bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.3)
+        bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.3) // view.frame.size.height * 0.3
         bottomConstraint.isActive = true
         popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.9).isActive = true
         
@@ -175,13 +233,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
         cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "192259") : UIColor(hex: "10194E")
         cell.textLabel?.textColor = UIColor(hex: "858EC5")
-        cell.textLabel?.text = selectedCurrencies[indexPath.row].name
+        cell.textLabel?.text = registeredCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
         return cell
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return selectedCurrencies.count
+        return registeredCurrencies.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -190,37 +248,44 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let state = currentState.opposite
-        let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
-            switch state {
-            case .open:
-                self.bottomConstraint.constant = self.view.frame.height * 0.9
-            case .closed:
-                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
+        print("allowDissmissModal is \(allowDissmissModal)")
+        if allowDissmissModal == true {
+            let transitionAnimator = UIViewPropertyAnimator(duration: 1, dampingRatio: 1, animations: {
+                switch state {
+                case .open:
+                    self.bottomConstraint.constant = self.view.frame.height * 0.9
+                case .closed:
+                    self.bottomConstraint.constant = self.view.frame.size.height * 0.4
+                }
+                self.view.layoutIfNeeded()
+            })
+            transitionAnimator.addCompletion { position in
+                switch position {
+                case .start:
+                    self.currentState = state.opposite
+                case .end:
+                    self.currentState = state
+                case .current:
+                    ()
+                }
+                switch self.currentState {
+                case .open:
+                    self.bottomConstraint.constant = self.view.frame.height * 0.9
+                case .closed:
+                    self.bottomConstraint.constant = self.view.frame.size.height * 0.4
+                }
             }
-            self.view.layoutIfNeeded()
-        })
-        transitionAnimator.addCompletion { position in
-            switch position {
-            case .start:
-                self.currentState = state.opposite
-            case .end:
-                self.currentState = state
-            case .current:
-                ()
-            }
-            switch self.currentState {
-            case .open:
-                self.bottomConstraint.constant = self.view.frame.height * 0.9
-            case .closed:
-                self.bottomConstraint.constant = self.view.frame.size.height * 0.4
-            }
+            transitionAnimator.startAnimation()
+        } else {
+            selectedRows.append(indexPath.row)
+            print("selectedRows are \(selectedRows)")
         }
-        transitionAnimator.startAnimation()
+        
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            selectedCurrencies.remove(at: indexPath.row)
+            registeredCurrencies.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .bottom)
         }
     }
