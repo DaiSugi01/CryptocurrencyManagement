@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -94,7 +94,6 @@
 				D18FC30D2E21DAA5776E1973 /* Pods-Cryptocurrency Management.debug.xcconfig */,
 				0C582C8FFEE690D5546A4098 /* Pods-Cryptocurrency Management.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

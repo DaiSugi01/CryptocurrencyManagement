@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Charts
 
 class AddCurrencyViewController: UIViewController {
 
@@ -242,6 +243,24 @@ class AddCurrencyViewController: UIViewController {
         return v
     }()
     
+    let lineChart: LineChartView = {
+        let lc = LineChartView()
+        lc.translatesAutoresizingMaskIntoConstraints = false
+        lc.xAxis.drawGridLinesEnabled = false
+        lc.xAxis.labelPosition = .bottom
+        lc.xAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.xAxis.labelCount = 12
+        lc.rightAxis.enabled = false
+        lc.leftAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.noDataTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.animate(xAxisDuration: 1.2, yAxisDuration: 1.5, easingOption: .easeInOutElastic)
+        lc.legend.enabled = false
+        lc.doubleTapToZoomEnabled = false
+        return lc
+    }()
+    
+    let values = [10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0]
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     let currencies = ["", "BTC", "ETH", "XRP", "German", "Science", "Japanese", "French"]
     var isPickerHidden = true
     
@@ -249,6 +268,9 @@ class AddCurrencyViewController: UIViewController {
         super.viewDidLoad()
         setDelegates()
         setupUI()
+        lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values:months)
+        lineChart.xAxis.granularity = 1
+        setLineGraph()
     }
     
     private func setDelegates() {
@@ -309,7 +331,7 @@ class AddCurrencyViewController: UIViewController {
 
         // add items into real time rate stack view
         realTimeRateWrapper.addArrangedSubview(realTimeRateSV)
-        realTimeRateWrapper.addArrangedSubview(currencyChart)
+        realTimeRateWrapper.addArrangedSubview(lineChart)
 
         realTimeRateSV.addArrangedSubview(realTimeRateLabel)
         realTimeRateSV.addArrangedSubview(realTimeRate)
@@ -327,7 +349,7 @@ class AddCurrencyViewController: UIViewController {
         scrollView.topAnchor.constraint(equalTo: headerSV.bottomAnchor, constant: 70).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
         
         contentSV.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor).isActive = true
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
@@ -363,9 +385,10 @@ class AddCurrencyViewController: UIViewController {
         realTimeRateSV.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         realTimeRateSV.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
 
-        currencyChart.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
-        currencyChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
-        currencyChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        lineChart.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        lineChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
+        lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+
     }
     
     private func isEnableSaveButton() -> Bool{
@@ -404,6 +427,27 @@ class AddCurrencyViewController: UIViewController {
             saveButton.isEnabled = false
             saveButton.setTitleColor(.lightGray, for: .normal)
         }
+    }
+    
+    func setLineGraph(){
+        var entry = [ChartDataEntry]()
+        
+        for (i,d) in values.enumerated(){
+            entry.append(ChartDataEntry(x: Double(i),y: d))
+        }
+        
+        let dataset = LineChartDataSet(entries: entry, label: "Price")
+        dataset.drawCirclesEnabled = false
+        dataset.mode = .cubicBezier
+        dataset.drawFilledEnabled = true
+        dataset.drawValuesEnabled = false
+        dataset.fillColor = #colorLiteral(red: 1, green: 0.8421531917, blue: 0.5401626297, alpha: 1)
+        dataset.highlightColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
+        dataset.colors = [#colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)]
+                    
+        
+        lineChart.data = LineChartData(dataSet: dataset)
+        lineChart.chartDescription?.text = nil
     }
 }
 
@@ -474,5 +518,13 @@ extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSourc
 extension AddCurrencyViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         enableSaveButton()
+    }
+}
+
+public class LineChartFormatter: NSObject, IAxisValueFormatter{
+    let months: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    public func stringForValue(_ value: Double, axis: AxisBase?) -> String {
+        return months[Int(value)]
     }
 }
