@@ -25,12 +25,24 @@ class ViewController: UIViewController {
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.setTitle("Add Currency", for: .normal)
         bt.setTitleColor(UIColor(hex: "#426DDC"), for: .normal)
-        bt.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        bt.frame = CGRect(x: 261, y: 76, width: 120, height: 36)
-        bt.layer.cornerRadius = bt.frame.height * 0.10
+        bt.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        bt.frame.size.height = 36
+        bt.layer.cornerRadius = bt.frame.height * 0.3
+        bt.titleEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         bt.backgroundColor = UIColor(hex: "#212A6B", alpha: 1.0)
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
+    }()
+    let helloLabel: UILabel = {
+        let lb = UILabel()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.frame.size.height = 36
+        lb.textAlignment = NSTextAlignment.center
+        lb.text = "Hello Daiki,"
+        lb.font = UIFont.systemFont(ofSize: 20)
+        lb.backgroundColor = UIColor(hex: "#010A43")
+        lb.textColor = .white
+        return lb
     }()
     let tableViewSwitchButton: UIButton = {
         let bt = UIButton()
@@ -39,10 +51,47 @@ class ViewController: UIViewController {
         bt.titleLabel?.font = UIFont.systemFont(ofSize: 40)
         bt.setTitleColor(UIColor(hex: "#FF2E63"), for: .normal)
         bt.frame = CGRect(x: 16, y: 76, width: 48, height: 48)
-        bt.layer.cornerRadius = bt.frame.height * 0.50
+        bt.layer.cornerRadius = bt.frame.height * 0.5
         bt.backgroundColor = UIColor(hex: "#212A6B")
         bt.addTarget(self, action: #selector(tableViewSwitchButtonTapped(_:)), for: .touchUpInside)
         return bt
+    }()
+    let headerWrapper: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    let tableHeaderSV: UIStackView = {
+        let sv = UIStackView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.distribution = .fill
+        sv.alignment = .fill
+        sv.spacing = 10
+        return sv
+    }()
+    let rootHeaderWrapper: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    let rootHeaderSV: UIStackView = {
+        let sv = UIStackView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = 10
+        return sv
+    }()
+    let tableHeaderRightSV: UIStackView = {
+        let sv = UIStackView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.distribution = .fillEqually
+        sv.alignment = .fill
+        sv.spacing = 10
+        return sv
     }()
     let editButton: UIButton = {
         let bt = UIButton()
@@ -55,8 +104,8 @@ class ViewController: UIViewController {
     let deleteButton: UIButton = {
         let bt = UIButton()
         bt.translatesAutoresizingMaskIntoConstraints = false
-        bt.setTitle("Delete", for: .normal)
-        bt.setTitleColor(UIColor(hex: "#fc0303"), for: .normal)
+        bt.setImage(UIImage(systemName: "trash"), for: .normal)
+        bt.tintColor = .red
         bt.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
@@ -71,7 +120,8 @@ class ViewController: UIViewController {
     private var currentState: State = .closed
     private lazy var popupView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(hex: "010A43")
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor(hex: "#10194E")
         view.layer.cornerRadius = 20
         return view
     }()
@@ -116,35 +166,9 @@ class ViewController: UIViewController {
     var selectedRows: [Int] = []
     
     
-    
     override func viewDidLoad() {
-        view.backgroundColor = UIColor(hex: "#010A43")
         super.viewDidLoad()
-        view.addSubview(addCurrencyButton)
-        view.addSubview(tableViewSwitchButton)
-        currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
-        currencyTableView.delegate = self
-        currencyTableView.dataSource = self
-        layout()
-        popupView.addSubview(editButton)
-        popupView.addSubview(deleteButton)
-        deleteButton.isHidden = true
-        popupView.addSubview(allCurrencyLabel)
-        NSLayoutConstraint.activate([
-            addCurrencyButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 80),
-            addCurrencyButton.trailingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -23),
-            addCurrencyButton.heightAnchor.constraint(equalToConstant: 36),
-            tableViewSwitchButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 74),
-            tableViewSwitchButton.leadingAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            tableViewSwitchButton.heightAnchor.constraint(equalToConstant: 48),
-            tableViewSwitchButton.widthAnchor.constraint(equalToConstant: 48),
-            editButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
-            editButton.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -24),
-            deleteButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 24),
-            deleteButton.trailingAnchor.constraint(equalTo: editButton.leadingAnchor, constant: -10),
-            allCurrencyLabel.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 28),
-            allCurrencyLabel.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 18)
-        ])
+        setupLayout()
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
@@ -161,14 +185,17 @@ class ViewController: UIViewController {
         // allow multiple selection
         currencyTableView.allowsMultipleSelection = true
         currencyTableView.allowsMultipleSelectionDuringEditing = true
-        let tableViewEditingMode = currencyTableView.isEditing  // false during editing mode (strange)
-        currencyTableView.setEditing(!tableViewEditingMode, animated: true)
+        currencyTableView.setEditing(!currencyTableView.isEditing, animated: true)
         // disable modal dismissal during editing
-        allowDissmissModal = tableViewEditingMode
+        allowDissmissModal = !currencyTableView.isEditing
         // show delete button during editing
-        deleteButton.isHidden = tableViewEditingMode
-        if tableViewEditingMode == true {
+        deleteButton.isHidden = !currencyTableView.isEditing
+        if currencyTableView.isEditing {
+            editButton.setTitle("✕", for: .normal)
+        } else {
+            // reset the contents of selectedRows array if the user stops editing without deleting
             selectedRows.removeAll()
+            editButton.setTitle("Edit", for: .normal)
         }
     }
     
@@ -178,31 +205,87 @@ class ViewController: UIViewController {
         for eachRow in sortedSelectedRows {
             registeredCurrencies.remove(at: eachRow)
         }
+        // reset the contents of selectedRows array after deleting selected items
         selectedRows.removeAll()
         currencyTableView.reloadData()
     }
     
     private var bottomConstraint = NSLayoutConstraint()
-    private func layout() {
+    
+    private func setupLayout() {
         view.backgroundColor = UIColor(hex: "#010A43")
-        popupView.translatesAutoresizingMaskIntoConstraints = false
-        popupView.backgroundColor = UIColor(hex: "#10194E")
-        view.addSubview(popupView)
-        popupView.addSubview(currencyTableView)
+        
+        // currencyTableView
+        currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
+        currencyTableView.delegate = self
+        currencyTableView.dataSource = self
         currencyTableView.backgroundColor = UIColor(hex: "#10194E")
         
-        popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2).isActive = true
-        popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2).isActive = true
+        // addSubview
+        view.addSubview(rootHeaderWrapper)
+        rootHeaderWrapper.addSubview(rootHeaderSV)
+        rootHeaderSV.addSubview(tableViewSwitchButton)
+        rootHeaderSV.addSubview(helloLabel)
+        rootHeaderSV.addSubview(addCurrencyButton)
+        view.addSubview(popupView)
+        popupView.addSubview(currencyTableView)
+        popupView.addSubview(headerWrapper)
+        headerWrapper.addSubview(tableHeaderSV)
+        tableHeaderSV.addArrangedSubview(allCurrencyLabel)
+        tableHeaderSV.addArrangedSubview(tableHeaderRightSV)
+        tableHeaderRightSV.addArrangedSubview(deleteButton)
+        tableHeaderRightSV.addArrangedSubview(editButton)
+        
+        deleteButton.isHidden = true
+                
+        NSLayoutConstraint.activate([
+            rootHeaderWrapper.heightAnchor.constraint(equalToConstant: 50),
+            rootHeaderWrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            rootHeaderWrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            rootHeaderWrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            
+            rootHeaderSV.topAnchor.constraint(equalTo: rootHeaderWrapper.topAnchor),
+            rootHeaderSV.bottomAnchor.constraint(equalTo: rootHeaderWrapper.bottomAnchor),
+            rootHeaderSV.leadingAnchor.constraint(equalTo: rootHeaderWrapper.leadingAnchor),
+            rootHeaderSV.trailingAnchor.constraint(equalTo: rootHeaderWrapper.trailingAnchor),
+            
+            tableViewSwitchButton.heightAnchor.constraint(equalToConstant: 48),
+            tableViewSwitchButton.widthAnchor.constraint(equalToConstant: 48),
+            
+            helloLabel.topAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.topAnchor, constant: 10),
+            helloLabel.leadingAnchor.constraint(greaterThanOrEqualTo: tableViewSwitchButton.trailingAnchor, constant: 10),
+            
+            addCurrencyButton.topAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.topAnchor, constant: 6),
+            addCurrencyButton.trailingAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            addCurrencyButton.heightAnchor.constraint(equalToConstant: 36),
+            addCurrencyButton.widthAnchor.constraint(equalToConstant: 140),
+            
+            tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
+            tableHeaderSV.heightAnchor.constraint(equalTo: headerWrapper.heightAnchor, multiplier: 0.7),
+            
+            headerWrapper.heightAnchor.constraint(equalToConstant: 50),
+            headerWrapper.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 20),
+            headerWrapper.leadingAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            headerWrapper.trailingAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            
+            tableHeaderSV.topAnchor.constraint(equalTo: headerWrapper.topAnchor),
+            tableHeaderSV.bottomAnchor.constraint(equalTo: headerWrapper.bottomAnchor),
+            tableHeaderSV.leadingAnchor.constraint(equalTo: headerWrapper.leadingAnchor),
+            tableHeaderSV.trailingAnchor.constraint(equalTo: headerWrapper.trailingAnchor),
+            
+            popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2),
+            popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2),
+            popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            
+            currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, constant: -60),
+            currencyTableView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor),
+            currencyTableView.leadingAnchor.constraint(equalTo: popupView.leadingAnchor),
+            currencyTableView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor)
+        ])
+        // for switching currencyTableView position
         bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.05)
         bottomConstraint.isActive = true
-        popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6).isActive = true
-        
-        currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, constant: -60).isActive = true
-        currencyTableView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor).isActive = true
-        currencyTableView.leadingAnchor.constraint(equalTo: popupView.leadingAnchor).isActive = true
-        currencyTableView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor).isActive = true
     }
-
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
@@ -218,6 +301,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
         cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].price)"
         cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
+        cell.imageView?.image = UIImage(named: "default")
         return cell
     }
     
@@ -230,7 +314,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if allowDissmissModal == true {
+        if allowDissmissModal {
             switchTableViewDisplay()
         } else {
             selectedRows.append(indexPath.row)
@@ -242,7 +326,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         if editingStyle == .delete {
             registeredCurrencies.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .bottom)
-            // for update cell.backgroundColor
+            // for updating cell.backgroundColor
             tableView.reloadData()
         }
     }
