@@ -33,24 +33,13 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
-    let helloLabel: UILabel = {
-        let lb = UILabel()
-        lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.frame.size.height = 36
-        lb.textAlignment = NSTextAlignment.center
-        lb.text = "Hello Daiki,"
-        lb.font = UIFont.systemFont(ofSize: 20)
-        lb.backgroundColor = UIColor(hex: "#010A43")
-        lb.textColor = .white
-        return lb
-    }()
     let tableViewSwitchButton: UIButton = {
         let bt = UIButton()
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.setTitle("＝", for: .normal)
         bt.titleLabel?.font = UIFont.systemFont(ofSize: 40)
         bt.setTitleColor(UIColor(hex: "#FF2E63"), for: .normal)
-        bt.frame = CGRect(x: 16, y: 76, width: 48, height: 48)
+        bt.frame.size.height = 48
         bt.layer.cornerRadius = bt.frame.height * 0.5
         bt.backgroundColor = UIColor(hex: "#212A6B")
         bt.addTarget(self, action: #selector(tableViewSwitchButtonTapped(_:)), for: .touchUpInside)
@@ -70,17 +59,12 @@ class ViewController: UIViewController {
         sv.spacing = 10
         return sv
     }()
-    let rootHeaderWrapper: UIView = {
-        let v = UIView()
-        v.translatesAutoresizingMaskIntoConstraints = false
-        return v
-    }()
     let rootHeaderSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
-        sv.distribution = .fill
-        sv.alignment = .center
+        sv.distribution = .equalSpacing
+        sv.alignment = .fill
         sv.spacing = 10
         return sv
     }()
@@ -222,11 +206,9 @@ class ViewController: UIViewController {
         currencyTableView.backgroundColor = UIColor(hex: "#10194E")
         
         // addSubview
-        view.addSubview(rootHeaderWrapper)
-        rootHeaderWrapper.addSubview(rootHeaderSV)
-        rootHeaderSV.addSubview(tableViewSwitchButton)
-        rootHeaderSV.addSubview(helloLabel)
-        rootHeaderSV.addSubview(addCurrencyButton)
+        view.addSubview(rootHeaderSV)
+        rootHeaderSV.addArrangedSubview(tableViewSwitchButton)
+        rootHeaderSV.addArrangedSubview(addCurrencyButton)
         view.addSubview(popupView)
         popupView.addSubview(currencyTableView)
         popupView.addSubview(headerWrapper)
@@ -239,25 +221,14 @@ class ViewController: UIViewController {
         deleteButton.isHidden = true
                 
         NSLayoutConstraint.activate([
-            rootHeaderWrapper.heightAnchor.constraint(equalToConstant: 50),
-            rootHeaderWrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            rootHeaderWrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            rootHeaderWrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            
-            rootHeaderSV.topAnchor.constraint(equalTo: rootHeaderWrapper.topAnchor),
-            rootHeaderSV.bottomAnchor.constraint(equalTo: rootHeaderWrapper.bottomAnchor),
-            rootHeaderSV.leadingAnchor.constraint(equalTo: rootHeaderWrapper.leadingAnchor),
-            rootHeaderSV.trailingAnchor.constraint(equalTo: rootHeaderWrapper.trailingAnchor),
+            rootHeaderSV.heightAnchor.constraint(equalToConstant: 50),
+            rootHeaderSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            rootHeaderSV.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            rootHeaderSV.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             
             tableViewSwitchButton.heightAnchor.constraint(equalToConstant: 48),
             tableViewSwitchButton.widthAnchor.constraint(equalToConstant: 48),
             
-            helloLabel.topAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.topAnchor, constant: 10),
-            helloLabel.leadingAnchor.constraint(greaterThanOrEqualTo: tableViewSwitchButton.trailingAnchor, constant: 10),
-            
-            addCurrencyButton.topAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.topAnchor, constant: 6),
-            addCurrencyButton.trailingAnchor.constraint(equalTo: rootHeaderSV.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            addCurrencyButton.heightAnchor.constraint(equalToConstant: 36),
             addCurrencyButton.widthAnchor.constraint(equalToConstant: 140),
             
             tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
