@@ -2,7 +2,7 @@
 //  AddCurrencyViewController.swift
 //  Cryptocurrency Management
 //
-//  Created by Yuki Tsukada on 2021/01/19.
+//  Created by Daiki Sugihara on 2021/01/19.
 //
 
 import UIKit
@@ -163,7 +163,7 @@ class AddCurrencyViewController: UIViewController {
     let lowPriceTF: UITextField = {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.addTarget(self, action: #selector(selectedTF(_:)), for: .editingDidBegin)
+        tf.addTarget(self, action: #selector(tfChanged(_:)), for: .editingChanged)
         tf.keyboardType = .numberPad
         tf.textAlignment = .right
         tf.backgroundColor = .white
@@ -191,7 +191,7 @@ class AddCurrencyViewController: UIViewController {
     let highPriceTF: UITextField = {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.addTarget(self, action: #selector(selectedTF(_:)), for: .editingDidBegin)
+        tf.addTarget(self, action: #selector(tfChanged(_:)), for: .editingChanged)
         tf.keyboardType = .numberPad
         tf.textAlignment = .right
         tf.backgroundColor = .white
@@ -236,31 +236,12 @@ class AddCurrencyViewController: UIViewController {
         return lb
     }()
     
-    let currencyChart: UIView = {
-        let v = UIView()
-        v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .green
-        return v
-    }()
-    
-    let lineChart: LineChartView = {
-        let lc = LineChartView()
-        lc.translatesAutoresizingMaskIntoConstraints = false
-        lc.xAxis.drawGridLinesEnabled = false
-        lc.xAxis.labelPosition = .bottom
-        lc.xAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.xAxis.labelCount = 12
-        lc.rightAxis.enabled = false
-        lc.leftAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.noDataTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.animate(xAxisDuration: 1.2, yAxisDuration: 1.5, easingOption: .easeInOutElastic)
-        lc.legend.enabled = false
-        lc.doubleTapToZoomEnabled = false
+    let lineChart: UIView = {
+        let lc = CustomLineChartView()
+        lc.noDataText = ""
         return lc
     }()
     
-    let values = [10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0, 10.0, 4.0, 6.0, 3.0, 12.0]
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     let currencies = ["", "BTC", "ETH", "XRP", "German", "Science", "Japanese", "French"]
     var isPickerHidden = true
     
@@ -268,9 +249,9 @@ class AddCurrencyViewController: UIViewController {
         super.viewDidLoad()
         setDelegates()
         setupUI()
-        lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values:months)
-        lineChart.xAxis.granularity = 1
-        setLineGraph()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
     }
     
     private func setDelegates() {
@@ -293,6 +274,7 @@ class AddCurrencyViewController: UIViewController {
         /* add item to views */
         view.addSubview(headerSV)
         view.addSubview(scrollView)
+        
         // add items into header stack view
         headerSV.addArrangedSubview(cancelButton)
         headerSV.addArrangedSubview(pageTitleLabel)
@@ -329,10 +311,11 @@ class AddCurrencyViewController: UIViewController {
         highPriceSV.addArrangedSubview(highPriceLabel)
         highPriceSV.addArrangedSubview(highPriceTF)
 
-        // add items into real time rate stack view
+        // add items into real time rate wrapper stack view
         realTimeRateWrapper.addArrangedSubview(realTimeRateSV)
         realTimeRateWrapper.addArrangedSubview(lineChart)
 
+        // add items into real time rate stack view
         realTimeRateSV.addArrangedSubview(realTimeRateLabel)
         realTimeRateSV.addArrangedSubview(realTimeRate)
         
@@ -388,7 +371,6 @@ class AddCurrencyViewController: UIViewController {
         lineChart.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         lineChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
         lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
     }
     
     private func isEnableSaveButton() -> Bool{
@@ -428,27 +410,6 @@ class AddCurrencyViewController: UIViewController {
             saveButton.setTitleColor(.lightGray, for: .normal)
         }
     }
-    
-    func setLineGraph(){
-        var entry = [ChartDataEntry]()
-        
-        for (i,d) in values.enumerated(){
-            entry.append(ChartDataEntry(x: Double(i),y: d))
-        }
-        
-        let dataset = LineChartDataSet(entries: entry, label: "Price")
-        dataset.drawCirclesEnabled = false
-        dataset.mode = .cubicBezier
-        dataset.drawFilledEnabled = true
-        dataset.drawValuesEnabled = false
-        dataset.fillColor = #colorLiteral(red: 1, green: 0.8421531917, blue: 0.5401626297, alpha: 1)
-        dataset.highlightColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
-        dataset.colors = [#colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)]
-                    
-        
-        lineChart.data = LineChartData(dataSet: dataset)
-        lineChart.chartDescription?.text = nil
-    }
 }
 
 extension AddCurrencyViewController {
@@ -458,7 +419,6 @@ extension AddCurrencyViewController {
     }
         
     @objc func keyboardWasShown(_ notification: NSNotification) {
-        
         guard let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
 
         let keyboardFrame = keyboardFrameValue.cgRectValue
@@ -474,9 +434,9 @@ extension AddCurrencyViewController {
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-    
-    @objc func selectedTF(_ sender: UITextField) {
-        hiddenPicker()
+        
+    @objc func tfChanged(_ sender: UITextField) {
+        enableSaveButton()
     }
     
     @objc private func saveButtonTapped() {
@@ -519,12 +479,8 @@ extension AddCurrencyViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         enableSaveButton()
     }
-}
-
-public class LineChartFormatter: NSObject, IAxisValueFormatter{
-    let months: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
-    public func stringForValue(_ value: Double, axis: AxisBase?) -> String {
-        return months[Int(value)]
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        hiddenPicker()
     }
 }
