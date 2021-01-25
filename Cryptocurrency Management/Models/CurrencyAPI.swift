@@ -60,7 +60,7 @@ class CurrencyAPI {
     struct Endpoint {
         
         struct Messari {
-            static let assetsUrl = "https://data.messari.io/api/v2/asse"
+            static let assetsUrl = "https://data.messari.io/api/v2/assets"
         }
     }
     
