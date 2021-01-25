@@ -424,8 +424,10 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func createDialogMessage() {
-        let dialogMessage = UIAlertController(title: "", message: "Sorry, we couldn't fetch data. Please try again", preferredStyle: .alert)
-        let wrong = UIAlertAction(title: "Dissmiss", style: .cancel, handler: nil)
+        let dialogMessage = UIAlertController(title: "", message: "Sorry, we couldn't fetch data.\n Please try again", preferredStyle: .alert)
+        let wrong = UIAlertAction(title: "Dissmiss", style: .cancel, handler: { (_) -> Void in
+            self.dismiss(animated: true, completion: nil)
+        })
         dialogMessage.addAction(wrong)
         self.present(dialogMessage, animated: true, completion: nil)
     }
