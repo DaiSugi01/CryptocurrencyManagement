@@ -2,10 +2,11 @@
 //  AddCurrencyViewController.swift
 //  Cryptocurrency Management
 //
-//  Created by Yuki Tsukada on 2021/01/19.
+//  Created by Daiki Sugihara on 2021/01/19.
 //
 
 import UIKit
+import Charts
 
 class AddCurrencyViewController: UIViewController {
 
@@ -162,7 +163,7 @@ class AddCurrencyViewController: UIViewController {
     let lowPriceTF: UITextField = {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.addTarget(self, action: #selector(selectedTF(_:)), for: .editingDidBegin)
+        tf.addTarget(self, action: #selector(tfChanged(_:)), for: .editingChanged)
         tf.keyboardType = .numberPad
         tf.textAlignment = .right
         tf.backgroundColor = .white
@@ -190,7 +191,7 @@ class AddCurrencyViewController: UIViewController {
     let highPriceTF: UITextField = {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.addTarget(self, action: #selector(selectedTF(_:)), for: .editingDidBegin)
+        tf.addTarget(self, action: #selector(tfChanged(_:)), for: .editingChanged)
         tf.keyboardType = .numberPad
         tf.textAlignment = .right
         tf.backgroundColor = .white
@@ -235,11 +236,10 @@ class AddCurrencyViewController: UIViewController {
         return lb
     }()
     
-    let currencyChart: UIView = {
-        let v = UIView()
-        v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .green
-        return v
+    let lineChart: UIView = {
+        let lc = CustomLineChartView()
+        lc.noDataText = ""
+        return lc
     }()
     
     let currencies = ["", "BTC", "ETH", "XRP", "German", "Science", "Japanese", "French"]
@@ -249,6 +249,9 @@ class AddCurrencyViewController: UIViewController {
         super.viewDidLoad()
         setDelegates()
         setupUI()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
     }
     
     private func setDelegates() {
@@ -271,6 +274,7 @@ class AddCurrencyViewController: UIViewController {
         /* add item to views */
         view.addSubview(headerSV)
         view.addSubview(scrollView)
+        
         // add items into header stack view
         headerSV.addArrangedSubview(cancelButton)
         headerSV.addArrangedSubview(pageTitleLabel)
@@ -307,16 +311,17 @@ class AddCurrencyViewController: UIViewController {
         highPriceSV.addArrangedSubview(highPriceLabel)
         highPriceSV.addArrangedSubview(highPriceTF)
 
-        // add items into real time rate stack view
+        // add items into real time rate wrapper stack view
         realTimeRateWrapper.addArrangedSubview(realTimeRateSV)
-        realTimeRateWrapper.addArrangedSubview(currencyChart)
+        realTimeRateWrapper.addArrangedSubview(lineChart)
 
+        // add items into real time rate stack view
         realTimeRateSV.addArrangedSubview(realTimeRateLabel)
         realTimeRateSV.addArrangedSubview(realTimeRate)
         
         setConstraints()
     }
-    
+     
     private func setConstraints() {
         /* header */
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
@@ -327,7 +332,7 @@ class AddCurrencyViewController: UIViewController {
         scrollView.topAnchor.constraint(equalTo: headerSV.bottomAnchor, constant: 70).isActive = true
         scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true
         
         contentSV.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor).isActive = true
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
@@ -363,9 +368,9 @@ class AddCurrencyViewController: UIViewController {
         realTimeRateSV.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         realTimeRateSV.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
 
-        currencyChart.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.9).isActive = true
-        currencyChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
-        currencyChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        lineChart.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        lineChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
+        lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
     private func isEnableSaveButton() -> Bool{
@@ -414,7 +419,6 @@ extension AddCurrencyViewController {
     }
         
     @objc func keyboardWasShown(_ notification: NSNotification) {
-        
         guard let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
 
         let keyboardFrame = keyboardFrameValue.cgRectValue
@@ -430,9 +434,9 @@ extension AddCurrencyViewController {
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-    
-    @objc func selectedTF(_ sender: UITextField) {
-        hiddenPicker()
+        
+    @objc func tfChanged(_ sender: UITextField) {
+        enableSaveButton()
     }
     
     @objc private func saveButtonTapped() {
@@ -474,5 +478,9 @@ extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSourc
 extension AddCurrencyViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         enableSaveButton()
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        hiddenPicker()
     }
 }
