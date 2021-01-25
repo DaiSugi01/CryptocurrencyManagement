@@ -321,7 +321,7 @@ class AddCurrencyViewController: UIViewController {
         
         setConstraints()
     }
-    
+     
     private func setConstraints() {
         /* header */
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
