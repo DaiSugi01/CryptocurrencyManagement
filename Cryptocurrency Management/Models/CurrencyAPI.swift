@@ -29,7 +29,6 @@ class CurrencyAPI {
     
     private func fetch<T: Decodable>(from url: URL, completion: @escaping (Result<T, NetworkError>) -> Void) {
         dataTask?.cancel()
-        print(url)
         dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard error == nil else {
                 completion(.failure(.client(message: "invalid request")))
