@@ -73,6 +73,7 @@
 		0A10E54125B576B000A45C3E /* Cryptocurrency Management */ = {
 			isa = PBXGroup;
 			children = (
+				0A10E55025B576B200A45C3E /* Info.plist */,
 				0A10E54225B576B000A45C3E /* AppDelegate.swift */,
 				0A10E54425B576B000A45C3E /* SceneDelegate.swift */,
 				0A10E54B25B576B200A45C3E /* Assets.xcassets */,
