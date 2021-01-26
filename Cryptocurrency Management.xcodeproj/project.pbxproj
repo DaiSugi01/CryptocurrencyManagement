@@ -19,7 +19,6 @@
 		618AF01525B6447C00C68DB4 /* UIColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618AF01425B6447C00C68DB4 /* UIColorHex.swift */; };
 		618AF01825B64A0400C68DB4 /* AddCurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618AF01725B64A0400C68DB4 /* AddCurrencyViewController.swift */; };
 		61E532DD25BFC8570036F91E /* OrderBook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E532DC25BFC8570036F91E /* OrderBook.swift */; };
-		61E532E125BFE74F0036F91E /* UIView+ConstraintLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E532E025BFE74F0036F91E /* UIView+ConstraintLayout.swift */; };
 		F5C721B88FF394CFA0D908DF /* Pods_Cryptocurrency_Management.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E12382DF82487DCFB1CCCD2F /* Pods_Cryptocurrency_Management.framework */; };
 /* End PBXBuildFile section */
 
@@ -39,7 +38,6 @@
 		618AF01425B6447C00C68DB4 /* UIColorHex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorHex.swift; sourceTree = "<group>"; };
 		618AF01725B64A0400C68DB4 /* AddCurrencyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCurrencyViewController.swift; sourceTree = "<group>"; };
 		61E532DC25BFC8570036F91E /* OrderBook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderBook.swift; sourceTree = "<group>"; };
-		61E532E025BFE74F0036F91E /* UIView+ConstraintLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+ConstraintLayout.swift"; sourceTree = "<group>"; };
 		D18FC30D2E21DAA5776E1973 /* Pods-Cryptocurrency Management.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptocurrency Management.debug.xcconfig"; path = "Target Support Files/Pods-Cryptocurrency Management/Pods-Cryptocurrency Management.debug.xcconfig"; sourceTree = "<group>"; };
 		E12382DF82487DCFB1CCCD2F /* Pods_Cryptocurrency_Management.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cryptocurrency_Management.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -94,7 +92,6 @@
 			children = (
 				618AF01425B6447C00C68DB4 /* UIColorHex.swift */,
 				0AC4C29025BEC0E2007F0B00 /* CustomLineChartView.swift */,
-				61E532E025BFE74F0036F91E /* UIView+ConstraintLayout.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -265,7 +262,6 @@
 				61E532DD25BFC8570036F91E /* OrderBook.swift in Sources */,
 				0A10E54325B576B000A45C3E /* AppDelegate.swift in Sources */,
 				0AC4C2B225BF87E4007F0B00 /* CurrencyList.swift in Sources */,
-				61E532E125BFE74F0036F91E /* UIView+ConstraintLayout.swift in Sources */,
 				618AF01825B64A0400C68DB4 /* AddCurrencyViewController.swift in Sources */,
 				0A10E54525B576B000A45C3E /* SceneDelegate.swift in Sources */,
 			);
