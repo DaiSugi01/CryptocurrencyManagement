@@ -264,7 +264,8 @@ class ViewController: UIViewController {
         setupLayout()
         orderBookCellRoop()
         print(orderBookChartContainer.frame.height)
-        print(CGFloat(orderBookCellSVHeight * registeredCurrencies.count))
+        print(CGFloat(orderBookCellSVHeight * registeredOrders.count))
+        print(registeredOrders.count)
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
@@ -398,7 +399,7 @@ class ViewController: UIViewController {
             orderBookScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15),
             
             orderBookChartContainer.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
-            orderBookChartContainer.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight * registeredCurrencies.count)),
+            orderBookChartContainer.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight * registeredOrders.count)),
                         
             tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
             tableHeaderSV.heightAnchor.constraint(equalTo: headerWrapper.heightAnchor, multiplier: 0.7),
@@ -505,7 +506,7 @@ class ViewController: UIViewController {
         }
         orderBookScrollView.contentSize = orderBookChartContainer.bounds.size
         
-        print("orderbook height \(CGFloat(CGFloat(orderBookCellSVHeight) * CGFloat(registeredCurrencies.count)))")
+        print("orderbook height \(orderBookCellSVHeight * registeredOrders.count)")
         print("orderBookScrollView.contentSize.height \(orderBookScrollView.contentSize.height)")
     }
 }
