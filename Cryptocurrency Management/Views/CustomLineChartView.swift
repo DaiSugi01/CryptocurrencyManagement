@@ -49,7 +49,7 @@ class CustomLineChartView: LineChartView {
         lineChart.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -10).isActive = true
         lineChart.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 10).isActive = true
 
-        setLineGraph()
+//        setLineGraph()
     }
     
     func setLineGraph(){

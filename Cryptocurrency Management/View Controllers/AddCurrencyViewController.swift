@@ -9,7 +9,7 @@ import UIKit
 import Charts
 
 class AddCurrencyViewController: UIViewController {
-
+    
     let headerSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -77,7 +77,7 @@ class AddCurrencyViewController: UIViewController {
         sv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 20)
         return sv
     }()
-
+    
     let currencySV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -129,7 +129,7 @@ class AddCurrencyViewController: UIViewController {
         lb.textColor = UIColor(hex: "858EC5")
         return lb
     }()
-
+    
     let alertSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -236,19 +236,22 @@ class AddCurrencyViewController: UIViewController {
         return lb
     }()
     
-    let lineChart: UIView = {
+    let lineChart: LineChartView = {
         let lc = CustomLineChartView()
         lc.noDataText = ""
         return lc
     }()
     
+    
     var currencies = [""]
+    var values = [Double]()
     var isPickerHidden = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegates()
         getCurrencyList()
+        getChartData()
         setupUI()
     }
     
@@ -267,16 +270,39 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func getCurrencyList() {
+        
         CurrencyAPI.shared.fetchCurrencyList { (result) in
-            switch result {
-            case .success(let currencyInfo):
-                for currency in currencyInfo.data {
-                    self.currencies.append(currency.symbol)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currencyInfo):
+                    for currency in currencyInfo.data {
+                        self.currencies.append(currency.symbol)
+                    }
+                case .failure(let error):
+                    print(error)
+                    self.createDialogMessage()
                 }
-            case .failure(let error):
-                print(error)
-                self.createDialogMessage()
             }
+        }
+    }
+    
+    private func getChartData() {
+        CurrencyAPI.shared.fetchCurrencyPriceTimeSeries { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currencyInfo):
+                    var tempCurrency = [Double]()
+                    for currency in currencyInfo.data.values {
+                        tempCurrency.append(currency[1])
+                    }
+                    self.values = tempCurrency
+                    self.setLineGraph()
+                case .failure(let error):
+                    print(error)
+                    self.createDialogMessage()
+                }
+            }
+            
         }
     }
     
@@ -294,7 +320,7 @@ class AddCurrencyViewController: UIViewController {
         
         // add stack view into scroll view
         scrollView.addSubview(contentSV)
-
+        
         // add items into content stack view
         contentSV.addArrangedSubview(currencyWrapper)
         contentSV.addArrangedSubview(alertWrapper)
@@ -333,7 +359,7 @@ class AddCurrencyViewController: UIViewController {
         
         setConstraints()
     }
-     
+    
     private func setConstraints() {
         /* header */
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
@@ -350,13 +376,13 @@ class AddCurrencyViewController: UIViewController {
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
         contentSV.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor).isActive = true
         contentSV.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor).isActive = true
-
+        
         /* currency area */
         currencyWrapper.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
         currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
-
+        
         /* alert area */
         alertWrapper.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         alertWrapper.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
@@ -383,6 +409,34 @@ class AddCurrencyViewController: UIViewController {
         lineChart.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         lineChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4).isActive = true
         lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    }
+    
+    //    private func setLineGraphData() {
+    //    }
+    //    let values = [10.0, 4.0, 6.0, 3.0, 12.0, 4.0, 6.0, 3.0, 12.0, 4.0, 6.0, 3.0, 12.0]
+    
+    func setLineGraph(){
+        print(#function)
+        print(values)
+        lineChart.noDataText = ""
+        
+        var entry = [ChartDataEntry]()
+        
+        for (i,d) in values.enumerated(){
+            entry.append(ChartDataEntry(x: Double(i),y: d))
+        }
+        
+        let dataset = LineChartDataSet(entries: entry, label: "Price")
+        dataset.drawCirclesEnabled = false
+        dataset.mode = .cubicBezier
+        dataset.drawFilledEnabled = true
+        dataset.drawValuesEnabled = false
+        dataset.fillColor = #colorLiteral(red: 1, green: 0.8421531917, blue: 0.5401626297, alpha: 1)
+        dataset.highlightColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
+        dataset.colors = [#colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)]
+        
+        lineChart.data = LineChartData(dataSet: dataset)
+        lineChart.chartDescription?.text = nil
     }
     
     private func isEnableSaveButton() -> Bool{
@@ -449,13 +503,13 @@ extension AddCurrencyViewController {
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-
+    
     @objc func keyboardWillBeHidden(_ notification: NSNotification) {
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-        
+    
     @objc func tfChanged(_ sender: UITextField) {
         enableSaveButton()
     }

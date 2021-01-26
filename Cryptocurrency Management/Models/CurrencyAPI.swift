@@ -27,8 +27,22 @@ class CurrencyAPI {
         }
     }
     
+    func fetchCurrencyPriceTimeSeries(completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
+        var urlComponents = URLComponents(string: Endpoint.Messari.priceTimeSeriesUrl)!
+        urlComponents.queryItems = [
+            Parameter.Messari.startDate : "2020-01-01",
+            Parameter.Messari.endDate : "2021-01-01",
+            Parameter.Messari.interval : "1d",
+            Parameter.Messari.columns : "close"
+        ].map { URLQueryItem(name: $0.key, value: $0.value) }
+        
+        fetch(from: urlComponents.url!) { (result: Result<CurrencyPriceTimeSeries, NetworkError>) in
+            completion(result)
+        }
+    }
+    
     private func fetch<T: Decodable>(from url: URL, completion: @escaping (Result<T, NetworkError>) -> Void) {
-        dataTask?.cancel()
+//        dataTask?.cancel()
         dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard error == nil else {
                 completion(.failure(.client(message: "invalid request")))
@@ -60,12 +74,18 @@ class CurrencyAPI {
         
         struct Messari {
             static let assetsUrl = "https://data.messari.io/api/v2/assets"
+            static let priceTimeSeriesUrl = "https://data.messari.io/api/v1/assets/BTC/metrics/price/time-series"
+            // "https://data.messari.io/api/v1/assets/BTC/metrics/price/time-series?start=2020-01-01&end=2021-01-01&interval=1d&columns=close"
         }
     }
     
     struct Parameter {
         struct Messari {
             static let fields = "fields"
+            static let startDate = "start"
+            static let endDate = "end"
+            static let interval = "interval"
+            static let columns = "columns"
         }
     }
     
