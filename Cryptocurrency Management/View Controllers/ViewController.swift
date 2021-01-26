@@ -256,6 +256,28 @@ class ViewController: UIViewController {
              Cryptocurrency(name: "Ethereum Classic", price: 7.75)]
     var allowDissmissModal = true
     var selectedRows: [Int] = []
+    var registeredOrders: [OrderBook] = [
+        OrderBook(currencyName: "Bitcoin", price: 4050.0, amount: 100, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4100.0, amount: 200, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4150.0, amount: 300, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4200.0, amount: 400, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4250.0, amount: 500, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4300.0, amount: 600, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4350.0, amount: 700, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4400.0, amount: 800, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4450.0, amount: 900, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4500.0, amount: 1000, orderBookType: OrderBook.OrderBookType.bid),
+        OrderBook(currencyName: "Bitcoin", price: 4550.0, amount: 1000, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4600.0, amount: 900, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4650.0, amount: 800, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4700.0, amount: 700, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4750.0, amount: 600, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4800.0, amount: 500, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4850.0, amount: 400, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4900.0, amount: 300, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 4950.0, amount: 200, orderBookType: OrderBook.OrderBookType.ask),
+        OrderBook(currencyName: "Bitcoin", price: 5000.0, amount: 100, orderBookType: OrderBook.OrderBookType.ask)
+    ]
     
     
     override func viewDidLoad() {
@@ -415,7 +437,9 @@ class ViewController: UIViewController {
     }
     
     private func orderBookCellRoop() {
-        for n in 0...3 {
+        var n = 0
+        let sortedRegisteredCurrencies = registeredOrders.sorted { $1.price < $0.price }
+        for order in sortedRegisteredCurrencies {
             let orderBookCellSV: UIStackView = {
                 let sv = UIStackView()
                 sv.translatesAutoresizingMaskIntoConstraints = false
@@ -428,7 +452,11 @@ class ViewController: UIViewController {
             let askAmountLabel: UILabel = {
                 let lb = UILabel()
                 lb.translatesAutoresizingMaskIntoConstraints = false
-                lb.text = "Ask Amount"
+                if order.orderBookType == OrderBook.OrderBookType.bid {
+                    lb.text = ""
+                } else {
+                    lb.text = "\(order.amount)"
+                }
                 lb.textAlignment = .center
                 lb.textColor = UIColor(hex: "#858EC5")
                 return lb
@@ -436,15 +464,24 @@ class ViewController: UIViewController {
             let eachPriceLabel: UILabel = {
                 let lb = UILabel()
                 lb.translatesAutoresizingMaskIntoConstraints = false
-                lb.text = "Each Price"
+                lb.text = "\(order.price)"
                 lb.textAlignment = .center
-                lb.textColor = UIColor(hex: "#858EC5")
+                if order.orderBookType == OrderBook.OrderBookType.bid {
+                    lb.textColor = UIColor(hex: "#1DC7AC")
+                } else {
+                    lb.textColor = UIColor(hex: "#FF3B30")
+                }
+                
                 return lb
             }()
             let bidAmountLabel: UILabel = {
                 let lb = UILabel()
                 lb.translatesAutoresizingMaskIntoConstraints = false
-                lb.text = "Bid Amount"
+                if order.orderBookType == OrderBook.OrderBookType.bid {
+                    lb.text = "\(order.amount)"
+                } else {
+                    lb.text = ""
+                }
                 lb.textAlignment = .center
                 lb.textColor = UIColor(hex: "#858EC5")
                 return lb
@@ -468,6 +505,7 @@ class ViewController: UIViewController {
             print(CGFloat(n) * orderBookCellSVHeight)
             print("n \(n)")
             print("orderBookCellSVHeight \(orderBookCellSVHeight)")
+            n += 1
             
         }
     }
