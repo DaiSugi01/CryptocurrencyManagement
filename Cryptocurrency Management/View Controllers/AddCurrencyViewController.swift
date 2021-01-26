@@ -9,7 +9,7 @@ import UIKit
 import Charts
 
 class AddCurrencyViewController: UIViewController {
-    
+
     let headerSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -77,7 +77,7 @@ class AddCurrencyViewController: UIViewController {
         sv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 20)
         return sv
     }()
-    
+
     let currencySV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -129,7 +129,7 @@ class AddCurrencyViewController: UIViewController {
         lb.textColor = UIColor(hex: "858EC5")
         return lb
     }()
-    
+
     let alertSV: UIStackView = {
         let sv = UIStackView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -294,7 +294,7 @@ class AddCurrencyViewController: UIViewController {
         
         // add stack view into scroll view
         scrollView.addSubview(contentSV)
-        
+
         // add items into content stack view
         contentSV.addArrangedSubview(currencyWrapper)
         contentSV.addArrangedSubview(alertWrapper)
@@ -333,7 +333,7 @@ class AddCurrencyViewController: UIViewController {
         
         setConstraints()
     }
-    
+     
     private func setConstraints() {
         /* header */
         headerSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
@@ -350,13 +350,13 @@ class AddCurrencyViewController: UIViewController {
         contentSV.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor).isActive = true
         contentSV.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor).isActive = true
         contentSV.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor).isActive = true
-        
+
         /* currency area */
         currencyWrapper.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
         currencyNameButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
         currencyNameButton.widthAnchor.constraint(equalTo: contentSV.widthAnchor, multiplier: 0.5).isActive = true
-        
+
         /* alert area */
         alertWrapper.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         alertWrapper.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
@@ -449,13 +449,13 @@ extension AddCurrencyViewController {
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-    
+
     @objc func keyboardWillBeHidden(_ notification: NSNotification) {
         let insets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         scrollView.contentInset = insets
         scrollView.scrollIndicatorInsets = insets
     }
-    
+        
     @objc func tfChanged(_ sender: UITextField) {
         enableSaveButton()
     }
