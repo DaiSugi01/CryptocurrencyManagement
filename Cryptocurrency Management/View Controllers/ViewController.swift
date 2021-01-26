@@ -257,15 +257,13 @@ class ViewController: UIViewController {
         OrderBook(currencyName: "Bitcoin", price: 5000.0, amount: 100, orderBookType: OrderBook.OrderBookType.ask)
     ]
     let orderBookCellSVHeight = 30
+//    var orderBookChartContainerHeight = orderBookCellSVHeight * registeredOrders.count
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
         orderBookCellRoop()
-        print(orderBookChartContainer.frame.height)
-        print(CGFloat(orderBookCellSVHeight * registeredOrders.count))
-        print(registeredOrders.count)
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
@@ -398,8 +396,8 @@ class ViewController: UIViewController {
             orderBookScrollView.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
             orderBookScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15),
             
-            orderBookChartContainer.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
-            orderBookChartContainer.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight * registeredOrders.count)),
+//            orderBookChartContainer.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
+//            orderBookChartContainer.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight * registeredOrders.count)),
                         
             tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
             tableHeaderSV.heightAnchor.constraint(equalTo: headerWrapper.heightAnchor, multiplier: 0.7),
@@ -504,10 +502,21 @@ class ViewController: UIViewController {
             
             n += 1
         }
+        orderBookChartContainer.frame.size.height = CGFloat(orderBookCellSVHeight * registeredOrders.count)
+        orderBookChartContainer.frame.size.width = view.frame.size.width
+        orderBookScrollView.frame.size.height = view.frame.size.height * 0.5
+        orderBookScrollView.frame.size.width = view.frame.size.width
         orderBookScrollView.contentSize = orderBookChartContainer.bounds.size
         
         print("orderbook height \(orderBookCellSVHeight * registeredOrders.count)")
         print("orderBookScrollView.contentSize.height \(orderBookScrollView.contentSize.height)")
+        
+        print(orderBookScrollView.frame)
+        print(orderBookChartContainer.frame)
+        print(orderBookChartContainer.bounds)
+        print(orderBookScrollView.contentSize)
+        print(CGFloat(orderBookCellSVHeight * registeredOrders.count))
+        print(registeredOrders.count)
     }
 }
 
