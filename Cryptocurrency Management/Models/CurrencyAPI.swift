@@ -40,6 +40,7 @@ class CurrencyAPI {
         let calculated = Calendar.current.date(byAdding: .year, value: -1, to: date)!
         let startDate = dateFormatter.string(from: calculated)
 
+        // replace currency name to make url
         let currencySymbol = currency.lowercased()
         let regex = try! NSRegularExpression(pattern: "/assets/[a-z]*/", options: .caseInsensitive)
         let newUrl = regex.stringByReplacingMatches(in: Endpoint.Messari.priceTimeSeriesUrl, options: [], range: NSRange(0..<Endpoint.Messari.priceTimeSeriesUrl.utf16.count), withTemplate: "/assets/\(currencySymbol)/")
