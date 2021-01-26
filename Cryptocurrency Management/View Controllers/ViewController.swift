@@ -127,39 +127,17 @@ class ViewController: UIViewController {
         return lb
     }()
     
-//    let orderBookCellSV: UIStackView = {
-//        let sv = UIStackView()
-//        sv.translatesAutoresizingMaskIntoConstraints = false
-//        sv.axis = .horizontal
-//        sv.distribution = .fillEqually
-//        sv.alignment = .center
-//        sv.spacing = 10
-//        return sv
-//    }()
-//    let askAmountLabel: UILabel = {
-//        let lb = UILabel()
-//        lb.translatesAutoresizingMaskIntoConstraints = false
-//        lb.text = "Ask Amount"
-//        lb.textAlignment = .center
-//        lb.textColor = UIColor(hex: "#858EC5")
-//        return lb
-//    }()
-//    let eachPriceLabel: UILabel = {
-//        let lb = UILabel()
-//        lb.translatesAutoresizingMaskIntoConstraints = false
-//        lb.text = "Each Price"
-//        lb.textAlignment = .center
-//        lb.textColor = UIColor(hex: "#858EC5")
-//        return lb
-//    }()
-//    let bidAmountLabel: UILabel = {
-//        let lb = UILabel()
-//        lb.translatesAutoresizingMaskIntoConstraints = false
-//        lb.text = "Bid Amount"
-//        lb.textAlignment = .center
-//        lb.textColor = UIColor(hex: "#858EC5")
-//        return lb
-//    }()
+    let orderBookChartContainer: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        return v
+    }()
+    
+    let orderBookScrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
     
     let headerWrapper: UIView = {
         let v = UIView()
@@ -278,6 +256,7 @@ class ViewController: UIViewController {
         OrderBook(currencyName: "Bitcoin", price: 4950.0, amount: 200, orderBookType: OrderBook.OrderBookType.ask),
         OrderBook(currencyName: "Bitcoin", price: 5000.0, amount: 100, orderBookType: OrderBook.OrderBookType.ask)
     ]
+    let orderBookCellSVHeight = 30
     
     
     override func viewDidLoad() {
@@ -331,8 +310,8 @@ class ViewController: UIViewController {
         view.backgroundColor = UIColor(hex: "#010A43")
         
         // spinner
-        spinner.startAnimating()
-        spinner.translatesAutoresizingMaskIntoConstraints = false
+//        spinner.startAnimating()
+//        spinner.translatesAutoresizingMaskIntoConstraints = false
         
         // currencyTableView
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
@@ -346,7 +325,7 @@ class ViewController: UIViewController {
         rootHeaderSV.addArrangedSubview(addCurrencyButton)
         
         view.addSubview(chartContainer)
-        chartContainer.addSubview(spinner)
+//        chartContainer.addSubview(spinner)
         chartContainer.addSubview(lineChart)
         
         view.addSubview(orderBookContainer)
@@ -356,7 +335,8 @@ class ViewController: UIViewController {
         orderBookContainerHeaderLowerSV.addArrangedSubview(askLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(priceLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(bidLabel)
-        
+        orderBookContainer.addSubview(orderBookScrollView)
+        orderBookScrollView.addSubview(orderBookChartContainer)
         
         
         view.addSubview(popupView)
@@ -386,18 +366,17 @@ class ViewController: UIViewController {
             chartContainer.widthAnchor.constraint(equalTo: view.widthAnchor),
             chartContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28),
             
-            spinner.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
+//            spinner.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
+//            spinner.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
             
-            lineChart.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor),
-            lineChart.topAnchor.constraint(equalTo: chartContainer.topAnchor),
             lineChart.widthAnchor.constraint(equalTo: chartContainer.widthAnchor),
             lineChart.heightAnchor.constraint(equalTo: chartContainer.heightAnchor),
+            lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             orderBookContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             orderBookContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             orderBookContainer.topAnchor.constraint(equalTo: chartContainer.bottomAnchor, constant: 20),
-//            orderBookContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            orderBookContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
             
             orderBookContainerHeaderSV.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
             orderBookContainerHeaderSV.trailingAnchor.constraint(equalTo: orderBookContainer.trailingAnchor),
@@ -407,6 +386,21 @@ class ViewController: UIViewController {
             orderBookLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05),
             
             orderBookContainerHeaderLowerSV.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.025),
+            
+            orderBookScrollView.topAnchor.constraint(equalTo: orderBookContainerHeaderSV.bottomAnchor),
+            orderBookScrollView.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
+            orderBookScrollView.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
+            orderBookScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15),
+            
+//            orderBookChartContainer.topAnchor.constraint(equalTo: orderBookContainerHeaderSV.bottomAnchor),
+//            orderBookChartContainer.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
+            orderBookChartContainer.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
+            orderBookChartContainer.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight * registeredCurrencies.count)),
+            
+//            orderBookChartContainer.topAnchor.constraint(equalTo: orderBookScrollView.contentLayoutGuide.topAnchor),
+//            orderBookChartContainer.leadingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.leadingAnchor),
+//            orderBookChartContainer.trailingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.trailingAnchor),
+//            orderBookChartContainer.bottomAnchor.constraint(equalTo: orderBookScrollView.contentLayoutGuide.bottomAnchor),
             
             
             tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
@@ -434,6 +428,14 @@ class ViewController: UIViewController {
         // for switching currencyTableView position
         bottomConstraint = popupView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: view.frame.size.height * 0.05)
         bottomConstraint.isActive = true
+        
+        print("orderbook height \(orderBookCellSVHeight * registeredCurrencies.count)")
+        print(orderBookScrollView.contentSize.height)
+        
+        orderBookChartContainer.anchors(topAnchor: orderBookScrollView.contentLayoutGuide.topAnchor, leadingAnchor: orderBookScrollView.contentLayoutGuide.leadingAnchor, trailingAnchor: orderBookScrollView.contentLayoutGuide.trailingAnchor, bottomAnchor: orderBookScrollView.contentLayoutGuide.bottomAnchor)
+        
+        print("orderBookChartContainer height \(orderBookChartContainer.frame.size.height)")
+        
     }
     
     private func orderBookCellRoop() {
@@ -487,12 +489,12 @@ class ViewController: UIViewController {
                 return lb
             }()
             
-            orderBookContainer.addSubview(orderBookCellSV)
+            orderBookChartContainer.addSubview(orderBookCellSV)
             orderBookCellSV.addArrangedSubview(askAmountLabel)
             orderBookCellSV.addArrangedSubview(eachPriceLabel)
             orderBookCellSV.addArrangedSubview(bidAmountLabel)
             
-            orderBookCellSV.heightAnchor.constraint(equalToConstant: 30).isActive = true
+            orderBookCellSV.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight)).isActive = true
             orderBookCellSV.layoutIfNeeded()
             let orderBookCellSVHeight = orderBookCellSV.frame.height
             
@@ -502,11 +504,8 @@ class ViewController: UIViewController {
                 orderBookCellSV.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
                 orderBookCellSV.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor)
             ])
-            print(CGFloat(n) * orderBookCellSVHeight)
-            print("n \(n)")
-            print("orderBookCellSVHeight \(orderBookCellSVHeight)")
-            n += 1
             
+            n += 1
         }
     }
 }
