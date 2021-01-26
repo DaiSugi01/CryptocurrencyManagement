@@ -28,19 +28,31 @@ class CurrencyAPI {
     }
     
     func fetchCurrencyPriceTimeSeries(currency: String, completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
+        
+        // current date
+        let date = Date()
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let endDate = dateFormatter.string(from: date)
+        
+        // 1 years ago date from current
+        let calculated = Calendar.current.date(byAdding: .year, value: -1, to: date)!
+        let startDate = dateFormatter.string(from: calculated)
 
         let currencySymbol = currency.lowercased()
         let regex = try! NSRegularExpression(pattern: "/assets/[a-z]*/", options: .caseInsensitive)
         let newUrl = regex.stringByReplacingMatches(in: Endpoint.Messari.priceTimeSeriesUrl, options: [], range: NSRange(0..<Endpoint.Messari.priceTimeSeriesUrl.utf16.count), withTemplate: "/assets/\(currencySymbol)/")
-
+        
         var urlComponents = URLComponents(string: newUrl)!
         urlComponents.queryItems = [
-            Parameter.Messari.startDate : "2020-01-01",
-            Parameter.Messari.endDate : "2021-01-01",
+            Parameter.Messari.startDate : startDate,
+            Parameter.Messari.endDate : endDate,
             Parameter.Messari.interval : "1d",
             Parameter.Messari.columns : "close"
         ].map { URLQueryItem(name: $0.key, value: $0.value) }
         
+        print(urlComponents.url!)
         fetch(from: urlComponents.url!) { (result: Result<CurrencyPriceTimeSeries, NetworkError>) in
             completion(result)
         }
