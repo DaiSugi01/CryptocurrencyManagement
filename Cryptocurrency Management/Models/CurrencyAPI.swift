@@ -27,8 +27,13 @@ class CurrencyAPI {
         }
     }
     
-    func fetchCurrencyPriceTimeSeries(completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
-        var urlComponents = URLComponents(string: Endpoint.Messari.priceTimeSeriesUrl)!
+    func fetchCurrencyPriceTimeSeries(currency: String, completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
+
+        let currencySymbol = currency.lowercased()
+        let regex = try! NSRegularExpression(pattern: "/assets/[a-z]*/", options: .caseInsensitive)
+        let newUrl = regex.stringByReplacingMatches(in: Endpoint.Messari.priceTimeSeriesUrl, options: [], range: NSRange(0..<Endpoint.Messari.priceTimeSeriesUrl.utf16.count), withTemplate: "/assets/\(currencySymbol)/")
+
+        var urlComponents = URLComponents(string: newUrl)!
         urlComponents.queryItems = [
             Parameter.Messari.startDate : "2020-01-01",
             Parameter.Messari.endDate : "2021-01-01",
@@ -42,7 +47,6 @@ class CurrencyAPI {
     }
     
     private func fetch<T: Decodable>(from url: URL, completion: @escaping (Result<T, NetworkError>) -> Void) {
-//        dataTask?.cancel()
         dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard error == nil else {
                 completion(.failure(.client(message: "invalid request")))
@@ -74,7 +78,7 @@ class CurrencyAPI {
         
         struct Messari {
             static let assetsUrl = "https://data.messari.io/api/v2/assets"
-            static let priceTimeSeriesUrl = "https://data.messari.io/api/v1/assets/BTC/metrics/price/time-series"
+            static let priceTimeSeriesUrl = "https://data.messari.io/api/v1/assets/currencyName/metrics/price/time-series"
             // "https://data.messari.io/api/v1/assets/BTC/metrics/price/time-series?start=2020-01-01&end=2021-01-01&interval=1d&columns=close"
         }
     }

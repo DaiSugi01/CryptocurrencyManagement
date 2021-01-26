@@ -238,11 +238,20 @@ class AddCurrencyViewController: UIViewController {
     
     let lineChart: LineChartView = {
         let lc = CustomLineChartView()
-        lc.noDataText = ""
+        lc.xAxis.granularity = 1
+        lc.xAxis.drawGridLinesEnabled = false
+        lc.xAxis.labelPosition = .bottom
+        lc.xAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.xAxis.labelCount = 12
+        lc.rightAxis.enabled = false
+        lc.leftAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.noDataTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+        lc.animate(xAxisDuration: 1.2, yAxisDuration: 1.5, easingOption: .easeInOutElastic)
+        lc.legend.enabled = false
+        lc.doubleTapToZoomEnabled = false
         return lc
     }()
-    
-    
+        
     var currencies = [""]
     var values = [Double]()
     var isPickerHidden = true
@@ -250,9 +259,8 @@ class AddCurrencyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegates()
-        getCurrencyList()
-        getChartData()
         setupUI()
+        getCurrencyList()
     }
     
     private func setDelegates() {
@@ -286,8 +294,8 @@ class AddCurrencyViewController: UIViewController {
         }
     }
     
-    private func getChartData() {
-        CurrencyAPI.shared.fetchCurrencyPriceTimeSeries { (result) in
+    private func getChartData(currencySymbol: String) {
+        CurrencyAPI.shared.fetchCurrencyPriceTimeSeries(currency: currencySymbol) { (result) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let currencyInfo):
@@ -302,7 +310,6 @@ class AddCurrencyViewController: UIViewController {
                     self.createDialogMessage()
                 }
             }
-            
         }
     }
     
@@ -411,15 +418,7 @@ class AddCurrencyViewController: UIViewController {
         lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
-    //    private func setLineGraphData() {
-    //    }
-    //    let values = [10.0, 4.0, 6.0, 3.0, 12.0, 4.0, 6.0, 3.0, 12.0, 4.0, 6.0, 3.0, 12.0]
-    
     func setLineGraph(){
-        print(#function)
-        print(values)
-        lineChart.noDataText = ""
-        
         var entry = [ChartDataEntry]()
         
         for (i,d) in values.enumerated(){
@@ -462,8 +461,18 @@ class AddCurrencyViewController: UIViewController {
     
     private func hiddenPicker() {
         if currencyPicker.isHidden { return }
+        
         UIView.animate(withDuration: 0.1) {
             self.currencyPicker.isHidden = true
+        }
+        
+        guard let currencyName = currencyNameButton.currentTitle else { return }
+        
+        if !currencyName.isEmpty {
+            getChartData(currencySymbol: currencyName)
+            lineChart.isHidden = false
+        } else {
+            lineChart.isHidden = true
         }
     }
     

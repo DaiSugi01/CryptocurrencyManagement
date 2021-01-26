@@ -13,18 +13,19 @@ class CustomLineChartView: LineChartView {
     let lineChart: LineChartView = {
         let lc = LineChartView()
         lc.translatesAutoresizingMaskIntoConstraints = false
+        lc.noDataText = ""
 //        lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values:months)
-        lc.xAxis.granularity = 1
-        lc.xAxis.drawGridLinesEnabled = false
-        lc.xAxis.labelPosition = .bottom
-        lc.xAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.xAxis.labelCount = 12
-        lc.rightAxis.enabled = false
-        lc.leftAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.noDataTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        lc.animate(xAxisDuration: 1.2, yAxisDuration: 1.5, easingOption: .easeInOutElastic)
-        lc.legend.enabled = false
-        lc.doubleTapToZoomEnabled = false
+//        lc.xAxis.granularity = 1
+//        lc.xAxis.drawGridLinesEnabled = false
+//        lc.xAxis.labelPosition = .bottom
+//        lc.xAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+//        lc.xAxis.labelCount = 12
+//        lc.rightAxis.enabled = false
+//        lc.leftAxis.labelTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+//        lc.noDataTextColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
+//        lc.animate(xAxisDuration: 1.2, yAxisDuration: 1.5, easingOption: .easeInOutElastic)
+//        lc.legend.enabled = false
+//        lc.doubleTapToZoomEnabled = false
         return lc
     }()
     
