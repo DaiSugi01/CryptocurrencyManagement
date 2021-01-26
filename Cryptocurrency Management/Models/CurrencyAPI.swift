@@ -52,7 +52,6 @@ class CurrencyAPI {
             Parameter.Messari.columns : "close"
         ].map { URLQueryItem(name: $0.key, value: $0.value) }
         
-        print(urlComponents.url!)
         fetch(from: urlComponents.url!) { (result: Result<CurrencyPriceTimeSeries, NetworkError>) in
             completion(result)
         }
