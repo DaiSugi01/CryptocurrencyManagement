@@ -322,14 +322,12 @@ class ViewController: UIViewController {
         chartContainer.addSubview(spinner)
         
         view.addSubview(orderBookContainer)
-        
         orderBookContainer.addArrangedSubview(orderBookContainerHeaderSV)
         orderBookContainerHeaderSV.addArrangedSubview(orderBookLabel)
         orderBookContainerHeaderSV.addArrangedSubview(orderBookContainerHeaderLowerSV)
         orderBookContainerHeaderLowerSV.addArrangedSubview(askLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(priceLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(bidLabel)
-        
         orderBookContainer.addArrangedSubview(orderBookScrollView)
         orderBookScrollView.addSubview(orderBookChartContainer)
         
@@ -369,6 +367,10 @@ class ViewController: UIViewController {
             orderBookContainer.topAnchor.constraint(equalTo: chartContainer.bottomAnchor, constant: 20),
             orderBookContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
             
+            orderBookContainerHeaderSV.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
+            orderBookContainerHeaderSV.trailingAnchor.constraint(equalTo: orderBookContainer.trailingAnchor),
+            orderBookContainerHeaderSV.topAnchor.constraint(equalTo: orderBookContainer.topAnchor),
+            
             orderBookLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.05),
             
             orderBookContainerHeaderLowerSV.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.025),
@@ -377,7 +379,9 @@ class ViewController: UIViewController {
             orderBookScrollView.leadingAnchor.constraint(equalTo: orderBookContainer.leadingAnchor),
             orderBookScrollView.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor),
             orderBookScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -15),
-            
+
+            orderBookChartContainer.topAnchor.constraint(equalTo: orderBookScrollView.contentLayoutGuide.topAnchor),
+            orderBookChartContainer.bottomAnchor.constraint(equalTo: orderBookScrollView.contentLayoutGuide.bottomAnchor),
             orderBookChartContainer.leadingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.leadingAnchor),
             orderBookChartContainer.trailingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.trailingAnchor),
                         
@@ -409,9 +413,7 @@ class ViewController: UIViewController {
     }
     
     private func createOrderBookContents() {
-        var n = 0
-        let orderBookCellSVHeight = 30
-        // may have to be delete later
+        // may have to be deleted later
         let sortedRegisteredCurrencies = registeredOrders.sorted { $1.price < $0.price }
         for order in sortedRegisteredCurrencies {
 
@@ -424,11 +426,7 @@ class ViewController: UIViewController {
             
             let askAmountLabel = UILabel()
             askAmountLabel.translatesAutoresizingMaskIntoConstraints = false
-            if order.orderBookType == OrderBook.OrderBookType.bid {
-                askAmountLabel.text = ""
-            } else {
-                askAmountLabel.text = "\(order.amount)"
-            }
+            askAmountLabel.text = (order.orderBookType == OrderBook.OrderBookType.bid) ? "" : "\(order.amount)"
             askAmountLabel.textAlignment = .center
             askAmountLabel.textColor = UIColor(hex: "#858EC5")
             
@@ -436,40 +434,19 @@ class ViewController: UIViewController {
             eachPriceLabel.translatesAutoresizingMaskIntoConstraints = false
             eachPriceLabel.text = "\(order.price)"
             eachPriceLabel.textAlignment = .center
-            if order.orderBookType == OrderBook.OrderBookType.bid {
-                eachPriceLabel.textColor = UIColor(hex: "#1DC7AC")
-            } else {
-                eachPriceLabel.textColor = UIColor(hex: "#FF3B30")
-            }
+            eachPriceLabel.textColor =  (order.orderBookType == OrderBook.OrderBookType.bid) ? UIColor(hex: "#1DC7AC") : UIColor(hex: "#FF3B30")
             
             let bidAmountLabel = UILabel()
             bidAmountLabel.translatesAutoresizingMaskIntoConstraints = false
-            if order.orderBookType == OrderBook.OrderBookType.bid {
-                bidAmountLabel.text = "\(order.amount)"
-            } else {
-                bidAmountLabel.text = ""
-            }
+            bidAmountLabel.text = (order.orderBookType == OrderBook.OrderBookType.bid) ? "\(order.amount)" : ""
             bidAmountLabel.textAlignment = .center
             bidAmountLabel.textColor = UIColor(hex: "#858EC5")
             
-            orderBookChartContainer.addSubview(orderBookCellSV)
+            orderBookChartContainer.addArrangedSubview(orderBookCellSV)
             orderBookCellSV.addArrangedSubview(askAmountLabel)
             orderBookCellSV.addArrangedSubview(eachPriceLabel)
             orderBookCellSV.addArrangedSubview(bidAmountLabel)
-            
-            orderBookCellSV.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight)).isActive = true
-            orderBookCellSV.layoutIfNeeded()
-            let orderBookCellSVHeightForConstraint = orderBookCellSV.frame.height            
-            
-            NSLayoutConstraint.activate([
-                orderBookCellSV.topAnchor.constraint(equalTo: orderBookChartContainer.topAnchor, constant: CGFloat(n) * orderBookCellSVHeightForConstraint),
-                orderBookCellSV.widthAnchor.constraint(equalTo: orderBookContainer.widthAnchor)
-            ])
-
-            n += 1
         }
-        orderBookChartContainer.frame.size.height = CGFloat(orderBookCellSVHeight * registeredOrders.count)
-        orderBookScrollView.contentSize = orderBookChartContainer.bounds.size
     }
 }
 
