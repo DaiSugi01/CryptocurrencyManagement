@@ -8,6 +8,10 @@
 import UIKit
 import Charts
 
+protocol AddEditCurrencyInfoDelegate {
+    func save(currency: Cryptocurrency)
+}
+
 class AddCurrencyViewController: UIViewController {
 
     let headerSV: UIStackView = {
@@ -244,6 +248,9 @@ class AddCurrencyViewController: UIViewController {
     
     var currencies = [""]
     var isPickerHidden = true
+    var delegate: AddEditCurrencyInfoDelegate?
+    var currency: [String: String] = [String: String]()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -265,12 +272,13 @@ class AddCurrencyViewController: UIViewController {
         lowPriceTF.delegate = self
         highPriceTF.delegate = self
     }
-    
+
     private func getCurrencyList() {
         CurrencyAPI.shared.fetchCurrencyList { (result) in
             switch result {
             case .success(let currencyInfo):
                 for currency in currencyInfo.data {
+                    self.currency[currency.symbol] = currency.name
                     self.currencies.append(currency.symbol)
                 }
             case .failure(let error):
@@ -461,7 +469,9 @@ extension AddCurrencyViewController {
     }
     
     @objc private func saveButtonTapped() {
-        print("Save button tapped")
+        guard let currencySymbol = currencyNameButton.currentTitle, let currencyName = currency[currencySymbol]  else { return }
+        delegate?.save(currency: Cryptocurrency(name: currencyName, price: 1.0))
+        dismiss(animated: true, completion: nil)
     }
     
     @objc private func cancelButtonTapped() {
