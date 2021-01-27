@@ -303,8 +303,6 @@ class ViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = UIColor(hex: "#010A43")
         
-        
-        
         // spinner
         spinner.startAnimating()
         spinner.translatesAutoresizingMaskIntoConstraints = false
@@ -315,7 +313,7 @@ class ViewController: UIViewController {
         currencyTableView.dataSource = self
         currencyTableView.backgroundColor = UIColor(hex: "#10194E")
         
-        // addSubview
+        // addSubview in detail page
         view.addSubview(rootHeaderSV)
         rootHeaderSV.addArrangedSubview(tableViewSwitchButton)
         rootHeaderSV.addArrangedSubview(addCurrencyButton)
@@ -324,18 +322,18 @@ class ViewController: UIViewController {
         chartContainer.addSubview(spinner)
         
         view.addSubview(orderBookContainer)
-        // modified
+        
         orderBookContainer.addArrangedSubview(orderBookContainerHeaderSV)
         orderBookContainerHeaderSV.addArrangedSubview(orderBookLabel)
         orderBookContainerHeaderSV.addArrangedSubview(orderBookContainerHeaderLowerSV)
         orderBookContainerHeaderLowerSV.addArrangedSubview(askLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(priceLabel)
         orderBookContainerHeaderLowerSV.addArrangedSubview(bidLabel)
-        // modified
+        
         orderBookContainer.addArrangedSubview(orderBookScrollView)
         orderBookScrollView.addSubview(orderBookChartContainer)
         
-        
+        // addSubView in main page
         view.addSubview(popupView)
         popupView.addSubview(currencyTableView)
         popupView.addSubview(headerWrapper)
@@ -347,7 +345,6 @@ class ViewController: UIViewController {
         
         deleteButton.isHidden = true
         
-                
         NSLayoutConstraint.activate([
             rootHeaderSV.heightAnchor.constraint(equalToConstant: 50),
             rootHeaderSV.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -462,8 +459,7 @@ class ViewController: UIViewController {
             
             orderBookCellSV.heightAnchor.constraint(equalToConstant: CGFloat(orderBookCellSVHeight)).isActive = true
             orderBookCellSV.layoutIfNeeded()
-            let orderBookCellSVHeightForConstraint = orderBookCellSV.frame.height
-            
+            let orderBookCellSVHeightForConstraint = orderBookCellSV.frame.height            
             
             NSLayoutConstraint.activate([
                 orderBookCellSV.topAnchor.constraint(equalTo: orderBookChartContainer.topAnchor, constant: CGFloat(n) * orderBookCellSVHeightForConstraint),
