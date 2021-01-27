@@ -91,7 +91,6 @@ class CurrencyAPI {
         struct Messari {
             static let assetsUrl = "https://data.messari.io/api/v2/assets"
             static let priceTimeSeriesUrl = "https://data.messari.io/api/v1/assets/currencyName/metrics/price/time-series"
-            // "https://data.messari.io/api/v1/assets/BTC/metrics/price/time-series?start=2020-01-01&end=2021-01-01&interval=1d&columns=close"
         }
     }
     
