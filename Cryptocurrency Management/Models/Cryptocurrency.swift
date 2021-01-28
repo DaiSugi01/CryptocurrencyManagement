@@ -9,7 +9,9 @@ import Foundation
 struct Cryptocurrency: Codable, Equatable {
     var name: String
     var symbol: String
-    var price: Double
+    var realTimeRate: Double
+    var lowPrice: Double?
+    var highPrice: Double?
     
     static func ==(lhs: Cryptocurrency, rhs: Cryptocurrency) -> Bool {
         return lhs.name == rhs.name
