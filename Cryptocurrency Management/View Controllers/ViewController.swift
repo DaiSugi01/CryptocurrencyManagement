@@ -269,7 +269,7 @@ class ViewController: UIViewController {
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
-        let nextView = AddCurrencyViewController()
+        let nextView = AddEditCurrencyViewController()
         nextView.modalTransitionStyle = .coverVertical
         nextView.delegate = self
         nextView.registeredCurrency = registeredCurrencies.map { $0.symbol }

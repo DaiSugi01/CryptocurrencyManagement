@@ -12,7 +12,7 @@ protocol AddEditCurrencyInfoDelegate {
     func save(currency: Cryptocurrency)
 }
 
-class AddCurrencyViewController: UIViewController {
+class AddEditCurrencyViewController: UIViewController {
     
     let headerSV: UIStackView = {
         let sv = UIStackView()
@@ -494,7 +494,7 @@ class AddCurrencyViewController: UIViewController {
     }
 }
 
-extension AddCurrencyViewController {
+extension AddEditCurrencyViewController {
     
     /********************** Keyboard ***********************/
     @objc func keyboardWasShown(_ notification: NSNotification) {
@@ -541,7 +541,7 @@ extension AddCurrencyViewController {
     }
 }
 
-extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSource  {
+extension AddEditCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSource  {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -561,7 +561,7 @@ extension AddCurrencyViewController: UIPickerViewDelegate, UIPickerViewDataSourc
     }
 }
 
-extension AddCurrencyViewController: UITextFieldDelegate {
+extension AddEditCurrencyViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         enableSaveButton()
     }
