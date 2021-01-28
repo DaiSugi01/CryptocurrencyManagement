@@ -197,10 +197,12 @@ class ViewController: UIViewController {
         tv.backgroundColor = .gray
         return tv
     }()
-    var registeredCurrencies: [Cryptocurrency] =
-            [
-                Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)
-            ]
+    
+    let defaults = UserDefaults.standard
+    
+    var registeredCurrencies = UserDefaults.standard.object(forKey: "RegisteredCurrencyList")
+        as? [Cryptocurrency] ?? [Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)]
+
     var allowDissmissModal = true
     var selectedRows: [Int] = []
     var registeredOrders: [OrderBook] = [
@@ -228,8 +230,33 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setDelegate()
         setupLayout()
         createOrderBookContents()
+        print("**************************")
+        print(registeredCurrencies)
+    }
+    
+    func setDelegate() {
+        /********************** App ***********************/
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(resignActive(_:)),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+    }
+    
+    func saveCurrencyListToLocal() {
+        let encoder = JSONEncoder()
+        if let encodedList = try? encoder.encode(registeredCurrencies) {
+            defaults.set(encodedList, forKey: "RegisteredCurrencyList")
+        }
+    }
+    
+    /********************** App ***********************/
+    @objc func resignActive(_ sender: UIApplication) {
+        saveCurrencyListToLocal()
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
@@ -503,6 +530,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 extension ViewController: AddEditCurrencyInfoDelegate {
     func save(currency: Cryptocurrency) {
         registeredCurrencies.append(currency)
+        saveCurrencyListToLocal()
         currencyTableView.reloadData()
     }
     

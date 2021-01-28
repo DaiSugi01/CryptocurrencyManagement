@@ -261,9 +261,19 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func setDelegates() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillBeHidden(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        /********************** Keyboard ***********************/
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWasShown(_:)),
+            name: UIResponder.keyboardDidShowNotification,
+            object: nil)
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillBeHidden(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil)
+                
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissPicker(_:)))
         view.addGestureRecognizer(gestureRecognizer)
         
@@ -475,11 +485,8 @@ class AddCurrencyViewController: UIViewController {
 }
 
 extension AddCurrencyViewController {
-    @objc func dismissPicker(_ sender: UITapGestureRecognizer) {
-        hiddenPicker()
-        view.endEditing(true)
-    }
     
+    /********************** Keyboard ***********************/
     @objc func keyboardWasShown(_ notification: NSNotification) {
         guard let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         
@@ -497,6 +504,11 @@ extension AddCurrencyViewController {
         scrollView.scrollIndicatorInsets = insets
     }
     
+    @objc func dismissPicker(_ sender: UITapGestureRecognizer) {
+        hiddenPicker()
+        view.endEditing(true)
+    }
+
     @objc func tfChanged(_ sender: UITextField) {
         enableSaveButton()
     }
