@@ -246,12 +246,12 @@ class AddCurrencyViewController: UIViewController {
         lc.noDataText = ""
         return lc
     }()
-        
+    
     var currencies = [""]
     var isPickerHidden = true
     var delegate: AddEditCurrencyInfoDelegate?
     var currency: [String: String] = [String: String]()
-
+    var registeredCurrency = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -273,16 +273,17 @@ class AddCurrencyViewController: UIViewController {
         lowPriceTF.delegate = self
         highPriceTF.delegate = self
     }
-
+    
     private func getCurrencyList() {
-        
         CurrencyAPI.shared.fetchCurrencyList { (result) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let currencyInfo):
                     for currency in currencyInfo.data {
-                    self.currency[currency.symbol] = currency.name
-                    self.currencies.append(currency.symbol)
+                        if !self.registeredCurrency.contains(currency.symbol) {
+                            self.currency[currency.symbol] = currency.name
+                            self.currencies.append(currency.symbol)
+                        }
                     }
                 case .failure(let error):
                     print(error)
@@ -502,7 +503,7 @@ extension AddCurrencyViewController {
     
     @objc private func saveButtonTapped() {
         guard let currencySymbol = currencyNameButton.currentTitle, let currencyName = currency[currencySymbol]  else { return }
-        delegate?.save(currency: Cryptocurrency(name: currencyName, price: 1.0))
+        delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, price: 1.0))
         dismiss(animated: true, completion: nil)
     }
     
@@ -547,3 +548,4 @@ extension AddCurrencyViewController: UITextFieldDelegate {
         hiddenPicker()
     }
 }
+
