@@ -200,8 +200,7 @@ class ViewController: UIViewController {
     
     let defaults = UserDefaults.standard
     
-    var registeredCurrencies = UserDefaults.standard.object(forKey: "RegisteredCurrencyList")
-        as? [Cryptocurrency] ?? [Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)]
+    var registeredCurrencies = [Cryptocurrency]()
 
     var allowDissmissModal = true
     var selectedRows: [Int] = []
@@ -230,11 +229,21 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setCurrencyListFromLocal()
         setDelegate()
         setupLayout()
         createOrderBookContents()
-        print("**************************")
-        print(registeredCurrencies)
+    }
+    
+    private func setCurrencyListFromLocal() {
+        if let savedCurrencyList = defaults.object(forKey: "RegisteredCurrencyList") as? Data {
+            let decoder = JSONDecoder()
+            if let loadedCurrencyList = try? decoder.decode([Cryptocurrency].self, from: savedCurrencyList) {
+                registeredCurrencies = loadedCurrencyList
+            }
+        } else {
+            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)]
+        }
     }
     
     func setDelegate() {
@@ -533,5 +542,4 @@ extension ViewController: AddEditCurrencyInfoDelegate {
         saveCurrencyListToLocal()
         currencyTableView.reloadData()
     }
-    
 }

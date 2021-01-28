@@ -105,6 +105,9 @@ class AddCurrencyViewController: UIViewController {
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.backgroundColor = .white
         bt.setTitleColor(.black, for: .normal)
+        bt.backgroundColor = .gray
+        bt.setTitle("Fetching...", for: .normal)
+        bt.isEnabled = false
         bt.addTarget(self, action: #selector(currencyNameButtonTapped(_:)), for: .touchUpInside)
         bt.layer.cornerRadius = 5.0
         return bt
@@ -295,6 +298,7 @@ class AddCurrencyViewController: UIViewController {
                             self.currencies.append(currency.symbol)
                         }
                     }
+                    self.setCurrencyButton()
                 case .failure(let error):
                     print(error)
                     self.createDialogMessage()
@@ -319,6 +323,12 @@ class AddCurrencyViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    private func setCurrencyButton() {
+        currencyNameButton.setTitle("", for: .normal)
+        currencyNameButton.backgroundColor = .white
+        currencyNameButton.isEnabled = true
     }
     
     private func setupUI() {
