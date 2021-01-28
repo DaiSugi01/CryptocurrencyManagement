@@ -71,7 +71,8 @@ class ViewController: UIViewController {
         sv.spacing = 10
         return sv
     }()
-    let spinner = UIActivityIndicatorView(style: .large)
+    let spinnerForChart = UIActivityIndicatorView(style: .large)
+    let spinnerForCurrencyList = UIActivityIndicatorView(style: .large)
     let chartContainer: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
@@ -249,6 +250,27 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
+        fetchRealTimeRate()
+    }
+    
+    private func fetchRealTimeRate() {
+        CurrencyAPI.shared.fetchCryptocurrencyFromNomics { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currencyInfo):
+                    for currency in currencyInfo {
+                        let name = currency.name
+                        let symbol = currency.symbol
+                        let price = Double(currency.price)
+                        self.registeredCurrencies.append(Cryptocurrency(name: name, symbol: symbol, realTimeRate: price!, lowPrice: nil, highPrice: nil))
+                    }
+                    self.currencyTableView.reloadData()
+                    self.spinnerForCurrencyList.stopAnimating()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
     }
     
     private func setCurrencyListFromLocal() {
@@ -334,9 +356,13 @@ class ViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = UIColor(hex: "#010A43")
         
-        // spinner
-        spinner.startAnimating()
-        spinner.translatesAutoresizingMaskIntoConstraints = false
+        // spinner  // spinnerForChart
+        spinnerForChart.startAnimating()
+        spinnerForChart.translatesAutoresizingMaskIntoConstraints = false
+        // spinnerForCurrencyList
+        spinnerForCurrencyList.startAnimating()
+        spinnerForCurrencyList.translatesAutoresizingMaskIntoConstraints = false
+        spinnerForCurrencyList.color = UIColor(hex: "#FF2E63")
         
         // currencyTableView
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
@@ -351,7 +377,7 @@ class ViewController: UIViewController {
         rootHeaderSV.addArrangedSubview(editCurrencyButton)
 
         view.addSubview(chartContainer)
-        chartContainer.addSubview(spinner)
+        chartContainer.addSubview(spinnerForChart)
         
         view.addSubview(orderBookContainer)
         orderBookContainer.addArrangedSubview(orderBookContainerHeaderSV)
@@ -367,6 +393,7 @@ class ViewController: UIViewController {
         view.addSubview(popupView)
         popupView.addSubview(currencyTableView)
         popupView.addSubview(headerWrapper)
+        popupView.addSubview(spinnerForCurrencyList)
         headerWrapper.addSubview(tableHeaderSV)
         tableHeaderSV.addArrangedSubview(allCurrencyLabel)
         tableHeaderSV.addArrangedSubview(tableHeaderRightSV)
@@ -392,8 +419,8 @@ class ViewController: UIViewController {
             chartContainer.widthAnchor.constraint(equalTo: view.widthAnchor),
             chartContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28),
             
-            spinner.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
+            spinnerForChart.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
+            spinnerForChart.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
             
             orderBookContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             orderBookContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -434,6 +461,9 @@ class ViewController: UIViewController {
             popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2),
             popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2),
             popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            
+            spinnerForCurrencyList.centerXAnchor.constraint(equalTo: popupView.centerXAnchor),
+            spinnerForCurrencyList.centerYAnchor.constraint(equalTo: popupView.centerYAnchor),
             
             currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, constant: -60),
             currencyTableView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor),

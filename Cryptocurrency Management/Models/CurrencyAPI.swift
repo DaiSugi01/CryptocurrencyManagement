@@ -27,6 +27,22 @@ class CurrencyAPI {
         }
     }
     
+    func fetchCryptocurrencyFromNomics(completion: @escaping (Result<[CurrencyRealTimeRate], NetworkError>) -> Void) {
+        var urlComponents = URLComponents(string: Endpoint.Nomics.namePriceUrl)!
+        urlComponents.queryItems = [
+            Parameter.Nomics.apiKey: CurrencyAPIKey.nomicsAPIKey,
+//            Parameter.Nomics.ids: "BTC, ETH",
+            Parameter.Nomics.perPage: "100",
+            Parameter.Nomics.page: "1",
+            Parameter.Nomics.interval: "1d",
+            Parameter.Nomics.convert: "CAD"
+        ].map { URLQueryItem(name: $0.key, value: $0.value) }
+
+        fetch(from: urlComponents.url!) { (result: Result<[CurrencyRealTimeRate], NetworkError>) in
+          completion(result)
+        }
+    }
+    
     func fetchCurrencyPriceTimeSeries(currency: String, completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
         
         // current date
@@ -92,6 +108,10 @@ class CurrencyAPI {
             static let assetsUrl = "https://data.messari.io/api/v2/assets"
             static let priceTimeSeriesUrl = "https://data.messari.io/api/v1/assets/currencyName/metrics/price/time-series"
         }
+        
+        struct Nomics {
+            static let namePriceUrl = "https://api.nomics.com/v1/currencies/ticker"
+        }
     }
     
     struct Parameter {
@@ -101,6 +121,15 @@ class CurrencyAPI {
             static let endDate = "end"
             static let interval = "interval"
             static let columns = "columns"
+        }
+        
+        struct Nomics {
+            static let apiKey = "key"
+            static let ids = "ids"
+            static let interval = "interval"
+            static let convert = "convert"
+            static let perPage = "per-page"
+            static let page = "page"
         }
     }
     
