@@ -34,6 +34,22 @@ class ViewController: UIViewController {
         bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
         return bt
     }()
+    
+    let editCurrencyButton: UIButton = {
+        let bt = UIButton()
+        bt.translatesAutoresizingMaskIntoConstraints = false
+        bt.setTitle("Edit Currency", for: .normal)
+        bt.setTitleColor(UIColor(hex: "#426DDC"), for: .normal)
+        bt.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        bt.frame.size.height = 36
+        bt.layer.cornerRadius = bt.frame.height * 0.3
+        bt.titleEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        bt.backgroundColor = UIColor(hex: "#212A6B", alpha: 1.0)
+        bt.isHidden = true
+        bt.addTarget(self, action: #selector(addCurrencyButtonTapped(_:)), for: .touchUpInside)
+        return bt
+    }()
+    
     let tableViewSwitchButton: UIButton = {
         let bt = UIButton()
         bt.translatesAutoresizingMaskIntoConstraints = false
@@ -201,7 +217,7 @@ class ViewController: UIViewController {
     let defaults = UserDefaults.standard
     
     var registeredCurrencies = [Cryptocurrency]()
-
+    var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil)
     var allowDissmissModal = true
     var selectedRows: [Int] = []
     var registeredOrders: [OrderBook] = [
@@ -242,7 +258,7 @@ class ViewController: UIViewController {
                 registeredCurrencies = loadedCurrencyList
             }
         } else {
-            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)]
+            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", realTimeRate: 45497.94, lowPrice: nil, highPrice: nil)]
         }
     }
     
@@ -273,6 +289,10 @@ class ViewController: UIViewController {
         nextView.modalTransitionStyle = .coverVertical
         nextView.delegate = self
         nextView.registeredCurrency = registeredCurrencies.map { $0.symbol }
+        
+        if !editCurrencyButton.isHidden {
+            nextView.currencyInfo = selectedCurrency
+        }
         present(nextView, animated: true, completion: nil)
     }
     
@@ -328,7 +348,8 @@ class ViewController: UIViewController {
         view.addSubview(rootHeaderSV)
         rootHeaderSV.addArrangedSubview(tableViewSwitchButton)
         rootHeaderSV.addArrangedSubview(addCurrencyButton)
-        
+        rootHeaderSV.addArrangedSubview(editCurrencyButton)
+
         view.addSubview(chartContainer)
         chartContainer.addSubview(spinner)
         
@@ -364,7 +385,8 @@ class ViewController: UIViewController {
             tableViewSwitchButton.widthAnchor.constraint(equalToConstant: 48),
             
             addCurrencyButton.widthAnchor.constraint(equalToConstant: 140),
-            
+            editCurrencyButton.widthAnchor.constraint(equalToConstant: 140),
+
             chartContainer.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             chartContainer.topAnchor.constraint(equalTo: rootHeaderSV.bottomAnchor, constant: 10),
             chartContainer.widthAnchor.constraint(equalTo: view.widthAnchor),
@@ -472,7 +494,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.textColor = UIColor(hex: "#858EC5")
         cell.textLabel?.text = registeredCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
-        cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].price)"
+        cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].realTimeRate)"
         cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
         cell.imageView?.image = UIImage(named: "default")
         return cell
@@ -492,6 +514,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         } else {
             selectedRows.append(indexPath.row)
         }
+        
+        selectedCurrency = registeredCurrencies[indexPath.row]
     }
     
     // swipe delete
@@ -533,12 +557,31 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             }
         }
         transitionAnimator.startAnimation()
+        
+        switch state {
+        case .open:
+            self.addCurrencyButton.isHidden = true
+            self.editCurrencyButton.isHidden = false
+        case .closed:
+            self.addCurrencyButton.isHidden = false
+            self.editCurrencyButton.isHidden = true
+        }
+        self.view.layoutIfNeeded()
+
     }
 }
 
 extension ViewController: AddEditCurrencyInfoDelegate {
     func save(currency: Cryptocurrency) {
         registeredCurrencies.append(currency)
+        saveCurrencyListToLocal()
+        currencyTableView.reloadData()
+    }
+    
+    func edit(currency: Cryptocurrency) {
+        if let index = registeredCurrencies.firstIndex(of: currency) {
+            registeredCurrencies[index] = currency
+        }
         saveCurrencyListToLocal()
         currencyTableView.reloadData()
     }

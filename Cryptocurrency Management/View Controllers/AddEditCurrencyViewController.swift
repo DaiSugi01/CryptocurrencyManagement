@@ -10,6 +10,7 @@ import Charts
 
 protocol AddEditCurrencyInfoDelegate {
     func save(currency: Cryptocurrency)
+    func edit(currency: Cryptocurrency)
 }
 
 class AddEditCurrencyViewController: UIViewController {
@@ -250,6 +251,7 @@ class AddEditCurrencyViewController: UIViewController {
         return lc
     }()
     
+    var currencyInfo: Cryptocurrency?
     var currencies = [""]
     var isPickerHidden = true
     var delegate: AddEditCurrencyInfoDelegate?
@@ -260,7 +262,12 @@ class AddEditCurrencyViewController: UIViewController {
         super.viewDidLoad()
         setDelegates()
         setupUI()
-        getCurrencyList()
+        
+        if currencyInfo == nil {
+            getCurrencyList()
+        } else {
+            setFieldsForEdit()
+        }
     }
     
     private func setDelegates() {
@@ -298,7 +305,7 @@ class AddEditCurrencyViewController: UIViewController {
                             self.currencies.append(currency.symbol)
                         }
                     }
-                    self.setCurrencyButton()
+                    self.makeCurrencyButtonEnabled(titleText: "")
                 case .failure(let error):
                     print(error)
                     self.createDialogMessage()
@@ -325,12 +332,18 @@ class AddEditCurrencyViewController: UIViewController {
         }
     }
     
-    private func setCurrencyButton() {
-        currencyNameButton.setTitle("", for: .normal)
+    private func makeCurrencyButtonEnabled(titleText: String) {
+        currencyNameButton.setTitle(titleText, for: .normal)
         currencyNameButton.backgroundColor = .white
         currencyNameButton.isEnabled = true
     }
-    
+
+    private func makeCurrencyButtonInvalid(titleText: String) {
+        currencyNameButton.setTitle(titleText, for: .normal)
+        currencyNameButton.backgroundColor = .gray
+        currencyNameButton.isEnabled = false
+    }
+
     private func setupUI() {
         view.backgroundColor = UIColor(hex: "10194E")
         
@@ -436,6 +449,27 @@ class AddEditCurrencyViewController: UIViewController {
         lineChart.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
+    private func setFieldsForEdit() {
+        // change screen title
+        pageTitleLabel.text = "Edit Currency"
+        
+        // set low price
+        if let lowPrice = currencyInfo?.lowPrice {
+            lowPriceTF.text = "\(lowPrice)"
+        }
+        
+        // set high price
+        if let highPrice = currencyInfo?.highPrice {
+            highPriceTF.text = "\(highPrice)"
+        }
+        
+        // make currencyNameButton invalid
+        makeCurrencyButtonInvalid(titleText: currencyInfo!.symbol)
+        
+        // set chart
+        getChartData(currencySymbol: currencyInfo!.symbol)
+    }
+    
     private func isEnableSaveButton() -> Bool{
         var isTextFieldValidPass = true
         if lowPriceTF.text != "" || highPriceTF.text != "" {
@@ -524,8 +558,27 @@ extension AddEditCurrencyViewController {
     }
     
     @objc private func saveButtonTapped() {
-        guard let currencySymbol = currencyNameButton.currentTitle, let currencyName = currency[currencySymbol]  else { return }
-        delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, price: 1.0))
+        guard let currencySymbol = currencyNameButton.currentTitle else { return }
+        
+        let lowPrice: Double?
+        lowPrice = !lowPriceTF.text!.isEmpty ? Double(lowPriceTF.text!) : nil
+        let highPrice: Double?
+        highPrice = !highPriceTF.text!.isEmpty ? Double(highPriceTF.text!) : nil
+
+        if pageTitleLabel.text == "Add Currency" {
+            if let currencyName = currency[currencySymbol] {
+                delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, realTimeRate: 100.0, lowPrice: lowPrice, highPrice: highPrice))
+            }
+        } else {
+            let currencyName = currencyInfo!.name
+            let symbol = currencyInfo!.symbol
+            delegate?.edit(currency: Cryptocurrency(
+                            name: currencyName,
+                            symbol: symbol,
+                            realTimeRate: 110.0,
+                            lowPrice: lowPrice,
+                            highPrice: highPrice))
+        }
         dismiss(animated: true, completion: nil)
     }
     
