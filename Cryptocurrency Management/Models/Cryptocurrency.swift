@@ -6,7 +6,12 @@
 //
 import Foundation
 
-struct Cryptocurrency: Codable {
+struct Cryptocurrency: Codable, Equatable {
     var name: String
+    var symbol: String
     var price: Double
+    
+    static func ==(lhs: Cryptocurrency, rhs: Cryptocurrency) -> Bool {
+        return lhs.name == rhs.name
+    }
 }

@@ -198,36 +198,9 @@ class ViewController: UIViewController {
         return tv
     }()
     var registeredCurrencies: [Cryptocurrency] =
-            [Cryptocurrency(name: "Bitcoin", price: 45497.94),
-             Cryptocurrency(name: "Ethereum", price: 1408.84),
-             Cryptocurrency(name: "Ripple", price: 0.301),
-             Cryptocurrency(name: "Litecoin", price: 180.64),
-             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
-             Cryptocurrency(name: "Stellar", price: 0.29),
-             Cryptocurrency(name: "EOS", price: 2.73),
-             Cryptocurrency(name: "Tezos", price: 2.75),
-             Cryptocurrency(name: "Dash", price: 113.29),
-             Cryptocurrency(name: "Ethereum Classic", price: 7.75),
-             Cryptocurrency(name: "Bitcoin", price: 45497.94),
-             Cryptocurrency(name: "Ethereum", price: 1408.84),
-             Cryptocurrency(name: "Ripple", price: 0.301),
-             Cryptocurrency(name: "Litecoin", price: 180.64),
-             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
-             Cryptocurrency(name: "Stellar", price: 0.29),
-             Cryptocurrency(name: "EOS", price: 2.73),
-             Cryptocurrency(name: "Tezos", price: 2.75),
-             Cryptocurrency(name: "Dash", price: 113.29),
-             Cryptocurrency(name: "Ethereum Classic", price: 7.75),
-             Cryptocurrency(name: "Bitcoin", price: 45497.94),
-             Cryptocurrency(name: "Ethereum", price: 1408.84),
-             Cryptocurrency(name: "Ripple", price: 0.301),
-             Cryptocurrency(name: "Litecoin", price: 180.64),
-             Cryptocurrency(name: "Bitcoin Cash", price: 476.05),
-             Cryptocurrency(name: "Stellar", price: 0.29),
-             Cryptocurrency(name: "EOS", price: 2.73),
-             Cryptocurrency(name: "Tezos", price: 2.75),
-             Cryptocurrency(name: "Dash", price: 113.29),
-             Cryptocurrency(name: "Ethereum Classic", price: 7.75)]
+            [
+                Cryptocurrency(name: "Bitcoin", symbol: "BTC", price: 45497.94)
+            ]
     var allowDissmissModal = true
     var selectedRows: [Int] = []
     var registeredOrders: [OrderBook] = [
@@ -262,6 +235,8 @@ class ViewController: UIViewController {
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
         let nextView = AddCurrencyViewController()
         nextView.modalTransitionStyle = .coverVertical
+        nextView.delegate = self
+        nextView.registeredCurrency = registeredCurrencies.map { $0.symbol }
         present(nextView, animated: true, completion: nil)
     }
     
@@ -523,4 +498,12 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
         transitionAnimator.startAnimation()
     }
+}
+
+extension ViewController: AddEditCurrencyInfoDelegate {
+    func save(currency: Cryptocurrency) {
+        registeredCurrencies.append(currency)
+        currencyTableView.reloadData()
+    }
+    
 }
