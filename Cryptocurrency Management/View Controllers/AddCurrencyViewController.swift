@@ -105,6 +105,9 @@ class AddCurrencyViewController: UIViewController {
         bt.translatesAutoresizingMaskIntoConstraints = false
         bt.backgroundColor = .white
         bt.setTitleColor(.black, for: .normal)
+        bt.backgroundColor = .gray
+        bt.setTitle("Fetching...", for: .normal)
+        bt.isEnabled = false
         bt.addTarget(self, action: #selector(currencyNameButtonTapped(_:)), for: .touchUpInside)
         bt.layer.cornerRadius = 5.0
         return bt
@@ -261,9 +264,19 @@ class AddCurrencyViewController: UIViewController {
     }
     
     private func setDelegates() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWasShown(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillBeHidden(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        /********************** Keyboard ***********************/
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWasShown(_:)),
+            name: UIResponder.keyboardDidShowNotification,
+            object: nil)
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillBeHidden(_:)),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil)
+                
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissPicker(_:)))
         view.addGestureRecognizer(gestureRecognizer)
         
@@ -285,6 +298,7 @@ class AddCurrencyViewController: UIViewController {
                             self.currencies.append(currency.symbol)
                         }
                     }
+                    self.setCurrencyButton()
                 case .failure(let error):
                     print(error)
                     self.createDialogMessage()
@@ -309,6 +323,12 @@ class AddCurrencyViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    private func setCurrencyButton() {
+        currencyNameButton.setTitle("", for: .normal)
+        currencyNameButton.backgroundColor = .white
+        currencyNameButton.isEnabled = true
     }
     
     private func setupUI() {
@@ -475,11 +495,8 @@ class AddCurrencyViewController: UIViewController {
 }
 
 extension AddCurrencyViewController {
-    @objc func dismissPicker(_ sender: UITapGestureRecognizer) {
-        hiddenPicker()
-        view.endEditing(true)
-    }
     
+    /********************** Keyboard ***********************/
     @objc func keyboardWasShown(_ notification: NSNotification) {
         guard let info = notification.userInfo, let keyboardFrameValue = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         
@@ -497,6 +514,11 @@ extension AddCurrencyViewController {
         scrollView.scrollIndicatorInsets = insets
     }
     
+    @objc func dismissPicker(_ sender: UITapGestureRecognizer) {
+        hiddenPicker()
+        view.endEditing(true)
+    }
+
     @objc func tfChanged(_ sender: UITextField) {
         enableSaveButton()
     }
