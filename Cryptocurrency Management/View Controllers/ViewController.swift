@@ -4,6 +4,7 @@
 //
 //  Created by Yuki Tsukada on 2021/01/17, advised by Daiki Sugihara.
 //
+
 import UIKit
 import Charts
 
@@ -251,22 +252,8 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
-//        makeIdsList()
         fetchRealTimeRate()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        fetchRealTimeRate()
-    }
-    
-//    func makeIdsList() {
-//        for (index, currency) in registeredCurrencies.enumerated() {
-//            idsList.append(currency.symbol)
-//            if index != registeredCurrencies.count - 1 {
-//                idsList.append(", ")
-//            }
-//        }
-//    }
     
     private func fetchRealTimeRate() {
         // when nothing is registered
