@@ -21,8 +21,6 @@ extension State {
     }
 }
 
-var idsList: String = ""
-
 class ViewController: UIViewController {
     let addCurrencyButton: UIButton = {
         let bt = UIButton()
