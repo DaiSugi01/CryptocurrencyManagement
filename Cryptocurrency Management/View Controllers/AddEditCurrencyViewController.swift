@@ -567,7 +567,7 @@ extension AddEditCurrencyViewController {
 
         if pageTitleLabel.text == "Add Currency" {
             if let currencyName = currency[currencySymbol] {
-                delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, realTimeRate: 100.0, lowPrice: lowPrice, highPrice: highPrice))
+                delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, realTimeRate: 100.0, lowPrice: lowPrice, highPrice: highPrice, image: ""))
             }
         } else {
             let currencyName = currencyInfo!.name
@@ -577,7 +577,8 @@ extension AddEditCurrencyViewController {
                             symbol: symbol,
                             realTimeRate: 110.0,
                             lowPrice: lowPrice,
-                            highPrice: highPrice))
+                            highPrice: highPrice,
+                            image: ""))
         }
         dismiss(animated: true, completion: nil)
     }

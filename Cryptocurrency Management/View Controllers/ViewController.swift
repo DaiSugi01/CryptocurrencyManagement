@@ -219,7 +219,7 @@ class ViewController: UIViewController {
     let defaults = UserDefaults.standard
     
     var registeredCurrencies = [Cryptocurrency]()
-    var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil)
+    var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil, image: "")
     var allowDissmissModal = true
     var registeredOrders: [OrderBook] = [
         OrderBook(currencyName: "Bitcoin", price: 4050.0, amount: 100, orderBookType: OrderBook.OrderBookType.bid),
@@ -278,13 +278,16 @@ class ViewController: UIViewController {
                     for currency in currencyInfo {
                         let symbol = currency.symbol
                         let price = Double(currency.price)
+                        let imageURL = currency.logo_url
                         for (index, target) in self.registeredCurrencies.enumerated() {
                             if target.symbol == symbol {
                                 self.registeredCurrencies[index].realTimeRate = price!
+                                self.registeredCurrencies[index].image = imageURL
                                 break
                             }
                         }
                     }
+                    print(currencyInfo)
                     self.currencyTableView.reloadData()
                     self.spinnerForCurrencyList.stopAnimating()
                 case .failure(let error):
@@ -301,7 +304,7 @@ class ViewController: UIViewController {
                 registeredCurrencies = loadedCurrencyList
             }
         } else {
-            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", realTimeRate: 45497.94, lowPrice: nil, highPrice: nil)]
+            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", realTimeRate: 45497.94, lowPrice: nil, highPrice: nil, image: "")]
         }
     }
     
@@ -546,7 +549,17 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
         cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].realTimeRate)"
         cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
-        cell.imageView?.image = UIImage(named: "default")
+        
+        for currency in registeredCurrencies {
+            if cell.textLabel?.text == currency.name {
+                if !currency.image.isEmpty {
+                    cell.imageView?.image = UIImage(url: currency.image)
+                } else {
+                    cell.imageView?.image = UIImage(named: "default")
+                }
+                break
+            }
+        }
         return cell
     }
     
