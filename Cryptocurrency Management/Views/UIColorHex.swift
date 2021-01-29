@@ -1,6 +1,6 @@
 //
 //  UIColorHex.swift
-//  NavbarAnimation
+//  Cryptocurrency Management
 //
 //  Created by Yuki Tsukada on 2021/01/13.
 //

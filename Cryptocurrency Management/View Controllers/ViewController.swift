@@ -4,6 +4,7 @@
 //
 //  Created by Yuki Tsukada on 2021/01/17, advised by Daiki Sugihara.
 //
+
 import UIKit
 import Charts
 
@@ -71,7 +72,8 @@ class ViewController: UIViewController {
         sv.spacing = 10
         return sv
     }()
-    let spinner = UIActivityIndicatorView(style: .large)
+    let spinnerForChart = UIActivityIndicatorView(style: .large)
+    let spinnerForCurrencyList = UIActivityIndicatorView(style: .large)
     let chartContainer: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
@@ -219,7 +221,6 @@ class ViewController: UIViewController {
     var registeredCurrencies = [Cryptocurrency]()
     var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil)
     var allowDissmissModal = true
-    var selectedRows: [Int] = []
     var registeredOrders: [OrderBook] = [
         OrderBook(currencyName: "Bitcoin", price: 4050.0, amount: 100, orderBookType: OrderBook.OrderBookType.bid),
         OrderBook(currencyName: "Bitcoin", price: 4100.0, amount: 200, orderBookType: OrderBook.OrderBookType.bid),
@@ -249,6 +250,36 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
+        fetchRealTimeRate()
+    }
+    
+    private func fetchRealTimeRate() {
+        // when nothing is registered
+        if registeredCurrencies.count == 0 { return }
+        // make a string to fetch registered currencies from nomics api
+        let currencySymbolsString: String = registeredCurrencies.map { $0.symbol }.joined(separator: ",")
+        
+        CurrencyAPI.shared.fetchCryptocurrencyFromNomics(currencySymbols: currencySymbolsString) { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currencyInfo):
+                    for currency in currencyInfo {
+                        let symbol = currency.symbol
+                        let price = Double(currency.price)
+                        for (index, target) in self.registeredCurrencies.enumerated() {
+                            if target.symbol == symbol {
+                                self.registeredCurrencies[index].realTimeRate = price!
+                                break
+                            }
+                        }
+                    }
+                    self.currencyTableView.reloadData()
+                    self.spinnerForCurrencyList.stopAnimating()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
     }
     
     private func setCurrencyListFromLocal() {
@@ -313,19 +344,18 @@ class ViewController: UIViewController {
             editButton.setTitle("✕", for: .normal)
         } else {
             // reset the contents of selectedRows array if the user stops editing without deleting
-            selectedRows.removeAll()
             editButton.setTitle("Edit", for: .normal)
         }
     }
     
     // multiple deletion
     @objc func deleteButtonTapped(_ sender: UIButton) {
-        let sortedSelectedRows = selectedRows.sorted { $0 > $1 }
-        for eachRow in sortedSelectedRows {
-            registeredCurrencies.remove(at: eachRow)
+        guard let selectedRows = currencyTableView.indexPathsForSelectedRows else { return }
+        let newSelectedRows = selectedRows.sorted { $0 < $1 }
+        
+        for indexPath in newSelectedRows.reversed() {
+            registeredCurrencies.remove(at: indexPath.row)
         }
-        // reset the contents of selectedRows array after deleting selected items
-        selectedRows.removeAll()
         currencyTableView.reloadData()
     }
     
@@ -334,9 +364,13 @@ class ViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = UIColor(hex: "#010A43")
         
-        // spinner
-        spinner.startAnimating()
-        spinner.translatesAutoresizingMaskIntoConstraints = false
+        // spinner  // spinnerForChart
+        spinnerForChart.startAnimating()
+        spinnerForChart.translatesAutoresizingMaskIntoConstraints = false
+        // spinnerForCurrencyList
+        spinnerForCurrencyList.startAnimating()
+        spinnerForCurrencyList.translatesAutoresizingMaskIntoConstraints = false
+        spinnerForCurrencyList.color = UIColor(hex: "#FF2E63")
         
         // currencyTableView
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
@@ -351,7 +385,7 @@ class ViewController: UIViewController {
         rootHeaderSV.addArrangedSubview(editCurrencyButton)
 
         view.addSubview(chartContainer)
-        chartContainer.addSubview(spinner)
+        chartContainer.addSubview(spinnerForChart)
         
         view.addSubview(orderBookContainer)
         orderBookContainer.addArrangedSubview(orderBookContainerHeaderSV)
@@ -367,6 +401,7 @@ class ViewController: UIViewController {
         view.addSubview(popupView)
         popupView.addSubview(currencyTableView)
         popupView.addSubview(headerWrapper)
+        popupView.addSubview(spinnerForCurrencyList)
         headerWrapper.addSubview(tableHeaderSV)
         tableHeaderSV.addArrangedSubview(allCurrencyLabel)
         tableHeaderSV.addArrangedSubview(tableHeaderRightSV)
@@ -392,8 +427,8 @@ class ViewController: UIViewController {
             chartContainer.widthAnchor.constraint(equalTo: view.widthAnchor),
             chartContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28),
             
-            spinner.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
+            spinnerForChart.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
+            spinnerForChart.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
             
             orderBookContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             orderBookContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -434,6 +469,9 @@ class ViewController: UIViewController {
             popupView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2),
             popupView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2),
             popupView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            
+            spinnerForCurrencyList.centerXAnchor.constraint(equalTo: popupView.centerXAnchor),
+            spinnerForCurrencyList.centerYAnchor.constraint(equalTo: popupView.centerYAnchor),
             
             currencyTableView.heightAnchor.constraint(equalTo: popupView.heightAnchor, constant: -60),
             currencyTableView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor),
@@ -511,10 +549,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if allowDissmissModal {
             switchTableViewDisplay()
-        } else {
-            selectedRows.append(indexPath.row)
         }
-        
         selectedCurrency = registeredCurrencies[indexPath.row]
     }
     
