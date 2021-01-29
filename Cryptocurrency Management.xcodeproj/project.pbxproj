@@ -18,6 +18,7 @@
 		0AC4C2A525BF8201007F0B00 /* CurrencyAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC4C2A425BF8201007F0B00 /* CurrencyAPI.swift */; };
 		0AC4C2B225BF87E4007F0B00 /* CurrencyList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC4C2B125BF87E4007F0B00 /* CurrencyList.swift */; };
 		0AC4C2BF25BF9673007F0B00 /* CurrencyPriceTimeSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC4C2BE25BF9673007F0B00 /* CurrencyPriceTimeSeries.swift */; };
+		617623EF25C4153B00FDE343 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 617623EE25C4153B00FDE343 /* UIImage.swift */; };
 		618AF01525B6447C00C68DB4 /* UIColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618AF01425B6447C00C68DB4 /* UIColorHex.swift */; };
 		618AF01825B64A0400C68DB4 /* AddEditCurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618AF01725B64A0400C68DB4 /* AddEditCurrencyViewController.swift */; };
 		61CB0D1025C37FD700AC714B /* CurrencyRealTimeRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61CB0D0F25C37FD700AC714B /* CurrencyRealTimeRate.swift */; };
@@ -40,6 +41,7 @@
 		0AC4C2B125BF87E4007F0B00 /* CurrencyList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyList.swift; sourceTree = "<group>"; };
 		0AC4C2BE25BF9673007F0B00 /* CurrencyPriceTimeSeries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyPriceTimeSeries.swift; sourceTree = "<group>"; };
 		0C582C8FFEE690D5546A4098 /* Pods-Cryptocurrency Management.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptocurrency Management.release.xcconfig"; path = "Target Support Files/Pods-Cryptocurrency Management/Pods-Cryptocurrency Management.release.xcconfig"; sourceTree = "<group>"; };
+		617623EE25C4153B00FDE343 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		618AF01425B6447C00C68DB4 /* UIColorHex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorHex.swift; sourceTree = "<group>"; };
 		618AF01725B64A0400C68DB4 /* AddEditCurrencyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditCurrencyViewController.swift; sourceTree = "<group>"; };
 		61CB0D0F25C37FD700AC714B /* CurrencyRealTimeRate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyRealTimeRate.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 			children = (
 				618AF01425B6447C00C68DB4 /* UIColorHex.swift */,
 				0AC4C29025BEC0E2007F0B00 /* CustomLineChartView.swift */,
+				617623EE25C4153B00FDE343 /* UIImage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 				0A7A3E7425C263B00081A7E6 /* CurrencyAPIKey.swift in Sources */,
 				618AF01825B64A0400C68DB4 /* AddEditCurrencyViewController.swift in Sources */,
 				0A10E54525B576B000A45C3E /* SceneDelegate.swift in Sources */,
+				617623EF25C4153B00FDE343 /* UIImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

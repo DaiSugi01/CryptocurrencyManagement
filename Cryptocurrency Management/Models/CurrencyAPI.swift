@@ -27,13 +27,11 @@ class CurrencyAPI {
         }
     }
     
-    func fetchCryptocurrencyFromNomics(completion: @escaping (Result<[CurrencyRealTimeRate], NetworkError>) -> Void) {
+    func fetchCryptocurrencyFromNomics(currencySymbols: String, completion: @escaping (Result<[CurrencyRealTimeRate], NetworkError>) -> Void) {
         var urlComponents = URLComponents(string: Endpoint.Nomics.namePriceUrl)!
         urlComponents.queryItems = [
             Parameter.Nomics.apiKey: CurrencyAPIKey.nomicsAPIKey,
-            Parameter.Nomics.ids: idsList,
-            Parameter.Nomics.perPage: "100",
-            Parameter.Nomics.page: "1",
+            Parameter.Nomics.ids: currencySymbols,
             Parameter.Nomics.interval: "1d",
             Parameter.Nomics.convert: "CAD"
         ].map { URLQueryItem(name: $0.key, value: $0.value) }
@@ -128,8 +126,6 @@ class CurrencyAPI {
             static let ids = "ids"
             static let interval = "interval"
             static let convert = "convert"
-            static let perPage = "per-page"
-            static let page = "page"
         }
     }
     
