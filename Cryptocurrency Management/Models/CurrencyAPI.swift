@@ -31,7 +31,7 @@ class CurrencyAPI {
         var urlComponents = URLComponents(string: Endpoint.Nomics.namePriceUrl)!
         urlComponents.queryItems = [
             Parameter.Nomics.apiKey: CurrencyAPIKey.nomicsAPIKey,
-//            Parameter.Nomics.ids: "BTC, ETH",
+            Parameter.Nomics.ids: idsList,
             Parameter.Nomics.perPage: "100",
             Parameter.Nomics.page: "1",
             Parameter.Nomics.interval: "1d",

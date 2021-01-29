@@ -20,6 +20,8 @@ extension State {
     }
 }
 
+var idsList: String = ""
+
 class ViewController: UIViewController {
     let addCurrencyButton: UIButton = {
         let bt = UIButton()
@@ -250,7 +252,20 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
+        makeIdsList()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         fetchRealTimeRate()
+    }
+    
+    func makeIdsList() {
+        for (index, currency) in registeredCurrencies.enumerated() {
+            idsList.append(currency.symbol)
+            if index != registeredCurrencies.count - 1 {
+                idsList.append(", ")
+            }
+        }
     }
     
     private func fetchRealTimeRate() {
@@ -259,10 +274,16 @@ class ViewController: UIViewController {
                 switch result {
                 case .success(let currencyInfo):
                     for currency in currencyInfo {
-                        let name = currency.name
                         let symbol = currency.symbol
                         let price = Double(currency.price)
-                        self.registeredCurrencies.append(Cryptocurrency(name: name, symbol: symbol, realTimeRate: price!, lowPrice: nil, highPrice: nil))
+                        var n = 0
+                        for (index, target) in self.registeredCurrencies.enumerated() {
+                            if target.symbol == symbol {
+                                n = index
+                                break
+                            }
+                        }
+                        self.registeredCurrencies[n].realTimeRate = price!
                     }
                     self.currencyTableView.reloadData()
                     self.spinnerForCurrencyList.stopAnimating()
