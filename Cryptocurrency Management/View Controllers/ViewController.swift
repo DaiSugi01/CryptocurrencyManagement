@@ -243,6 +243,7 @@ class ViewController: UIViewController {
         OrderBook(currencyName: "Bitcoin", price: 4950.0, amount: 200, orderBookType: OrderBook.OrderBookType.ask),
         OrderBook(currencyName: "Bitcoin", price: 5000.0, amount: 100, orderBookType: OrderBook.OrderBookType.ask)
     ]
+    weak var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -250,7 +251,18 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
-        fetchRealTimeRate()
+        startTimer()
+    }
+    
+    private func startTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+            self.fetchRealTimeRate()
+        }
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
     }
     
     private func fetchRealTimeRate() {
