@@ -256,7 +256,7 @@ class ViewController: UIViewController {
     
     private func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
             self.fetchRealTimeRate()
         }
     }
