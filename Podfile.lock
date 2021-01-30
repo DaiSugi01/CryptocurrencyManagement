@@ -5,26 +5,22 @@ PODS:
   - SDWebImage/Core (5.10.3)
   - SDWebImageSVGCoder (1.6.0):
     - SDWebImage/Core (~> 5.6)
-  - SwiftSVG (2.3.2)
 
 DEPENDENCIES:
   - Charts
   - SDWebImageSVGCoder
-  - SwiftSVG (~> 2.0)
 
 SPEC REPOS:
   trunk:
     - Charts
     - SDWebImage
     - SDWebImageSVGCoder
-    - SwiftSVG
 
 SPEC CHECKSUMS:
   Charts: b1e3a1f5a1c9ba5394438ca3b91bd8c9076310af
   SDWebImage: e378178472b735e84b007bfb55514c97948a0598
   SDWebImageSVGCoder: 020cc0f1ab0ef8ca63a9365c03421d67aa3d4a46
-  SwiftSVG: ca7f64e403b8ea7ea8eba8c823b83ba4a059834c
 
-PODFILE CHECKSUM: aa3531cb02f71b17c1f735a8fe087af35eb394b7
+PODFILE CHECKSUM: 10880abd33839a2004344495af596a5237c4073e
 
 COCOAPODS: 1.10.1

@@ -288,7 +288,6 @@ class ViewController: UIViewController {
                             }
                         }
                     }
-                    print(currencyInfo)
                     self.currencyTableView.reloadData()
                     self.spinnerForCurrencyList.stopAnimating()
                 case .failure(let error):
@@ -555,7 +554,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             if cell.textLabel?.text == currency.name {
                 if currency.image.hasSuffix(".svg") {
                     let svgURL = URL(string: currency.image)
-                    print("svgURL \(svgURL!)")
                     cell.imageView?.sd_setImage(with: svgURL)
                 } else if !currency.image.isEmpty {
                     cell.imageView?.image = UIImage(url: currency.image)
