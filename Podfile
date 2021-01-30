@@ -7,4 +7,5 @@ target 'Cryptocurrency Management' do
 
   # Pods for Cryptocurrency Management
   pod 'Charts'
+  pod 'SDWebImageSVGCoder'
 end
