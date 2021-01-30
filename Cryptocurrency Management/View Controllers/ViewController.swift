@@ -7,6 +7,7 @@
 
 import UIKit
 import Charts
+import SDWebImageSVGCoder
 
 private enum State {
     case closed
@@ -552,7 +553,11 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         
         for currency in registeredCurrencies {
             if cell.textLabel?.text == currency.name {
-                if !currency.image.isEmpty {
+                if currency.image.hasSuffix(".svg") {
+                    let svgURL = URL(string: currency.image)
+                    print("svgURL \(svgURL!)")
+                    cell.imageView?.sd_setImage(with: svgURL)
+                } else if !currency.image.isEmpty {
                     cell.imageView?.image = UIImage(url: currency.image)
                 } else {
                     cell.imageView?.image = UIImage(named: "default")
