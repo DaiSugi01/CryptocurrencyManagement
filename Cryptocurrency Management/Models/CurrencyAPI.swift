@@ -41,6 +41,20 @@ class CurrencyAPI {
         }
     }
     
+    func fetchOrderbookFromShrimpy(targetCurrency: String, completion: @escaping (Result<[OrderbookContents], NetworkError>) -> Void) {
+        var urlComponents = URLComponents(string: Endpoint.Shrimpy.orderbookUrl)!
+        urlComponents.queryItems = [
+            Parameter.Shrimpy.exchange: "Bittrex",
+            Parameter.Shrimpy.targetCurrency: targetCurrency,
+            Parameter.Shrimpy.priceIn: "USDT",
+            Parameter.Shrimpy.maxNum: "10"
+        ].map { URLQueryItem(name: $0.key, value: $0.value) }
+        
+        fetch(from: urlComponents.url!) { (result: Result<[OrderbookContents], NetworkError>) in
+            completion(result)
+        }
+    }
+    
     func fetchCurrencyPriceTimeSeries(currency: String, completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
         
         // current date
@@ -110,6 +124,10 @@ class CurrencyAPI {
         struct Nomics {
             static let namePriceUrl = "https://api.nomics.com/v1/currencies/ticker"
         }
+        
+        struct Shrimpy {
+            static let orderbookUrl = "https://dev-api.shrimpy.io/v1/orderbooks"
+        }
     }
     
     struct Parameter {
@@ -126,6 +144,13 @@ class CurrencyAPI {
             static let ids = "ids"
             static let interval = "interval"
             static let convert = "convert"
+        }
+        
+        struct Shrimpy {
+            static let exchange = "exchange"
+            static let targetCurrency = "baseSymbol"
+            static let priceIn = "quoteSymbol"
+            static let maxNum = "limit"
         }
     }
     

@@ -297,6 +297,20 @@ class ViewController: UIViewController {
         }
     }
     
+    private func fetchOrderBook() {
+        CurrencyAPI.shared.fetchOrderbookFromShrimpy(targetCurrency: selectedCurrency.symbol)  { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let orderbookInfo):
+                    print("orderbookInfo \(orderbookInfo)")
+                case .failure(let error):
+                    print(error)
+                    print("orderbookInfo error")
+                }
+            }
+        }
+    }
+    
     private func setCurrencyListFromLocal() {
         if let savedCurrencyList = defaults.object(forKey: "RegisteredCurrencyList") as? Data {
             let decoder = JSONDecoder()
@@ -580,6 +594,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             switchTableViewDisplay()
         }
         selectedCurrency = registeredCurrencies[indexPath.row]
+        fetchOrderBook()
     }
     
     // swipe delete
