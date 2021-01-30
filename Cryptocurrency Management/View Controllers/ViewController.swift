@@ -542,7 +542,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .value1 , reuseIdentifier: cellId)
+        let cell = CurrencyTableViewCell(style: .value1 , reuseIdentifier: cellId)
         cell.backgroundColor = indexPath.row % 2 == 0 ? UIColor(hex: "#192259") : UIColor(hex: "#10194E")
         cell.textLabel?.textColor = UIColor(hex: "#858EC5")
         cell.textLabel?.text = registeredCurrencies[indexPath.row].name
@@ -555,6 +555,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                 if currency.image.hasSuffix(".svg") {
                     let svgURL = URL(string: currency.image)
                     cell.imageView?.sd_setImage(with: svgURL)
+
                 } else if !currency.image.isEmpty {
                     cell.imageView?.image = UIImage(url: currency.image)
                 } else {
