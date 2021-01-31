@@ -329,8 +329,15 @@ class ViewController: UIViewController {
         /********************** App ***********************/
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(resignActive(_:)),
+            selector: #selector(resignActiveApp(_:)),
             name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(willTerminateApp(_:)),
+            name: UIApplication.willTerminateNotification,
             object: nil
         )
     }
@@ -343,7 +350,12 @@ class ViewController: UIViewController {
     }
     
     /********************** App ***********************/
-    @objc func resignActive(_ sender: UIApplication) {
+    @objc func resignActiveApp(_ sender: UIApplication) {
+        print(#function)
+        saveCurrencyListToLocal()
+    }
+    
+    @objc func willTerminateApp(_ sender: UIApplication) {
         saveCurrencyListToLocal()
     }
     
