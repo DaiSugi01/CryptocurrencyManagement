@@ -612,6 +612,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                 self.currentState = state
             case .current:
                 ()
+            default:
+                fatalError("Invalid Parameter")
             }
             switch self.currentState {
             case .open:
