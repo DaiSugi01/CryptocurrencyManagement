@@ -240,7 +240,6 @@ class ViewController: UIViewController {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
             self.fetchRealTimeRate()
-//            self.fetchOrderBook()
         }
     }
     
@@ -282,25 +281,27 @@ class ViewController: UIViewController {
     private func fetchOrderBook() {
         CurrencyAPI.shared.fetchOrderbookFromShrimpy(targetCurrency: selectedCurrency.symbol)  { (result) in
             DispatchQueue.main.async {
+                self.spinnerForOrderBook.startAnimating()
+                // reset the previous orderbook contents from the view
+                self.removeOrderBooks()
+                self.registeredOrders.removeAll()
                 switch result {
                 case .success(let orderbookInfo):
-                    if !self.registeredOrders.isEmpty {
-                        self.registeredOrders.removeAll()
-                    }
                     for eachOrderBook in orderbookInfo.first!.orderBooks {
                         for eachAsk in eachOrderBook.orderBook.asks {
-                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: Double(eachAsk.price)!, amount: Double(eachAsk.quantity)!, orderBookType: OrderBook.OrderBookType.ask))
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachAsk.price)!*100000)/100000, amount: round(Double(eachAsk.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.ask))
                         }
                         for eachBid in eachOrderBook.orderBook.bids {
-                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: Double(eachBid.price)!, amount: Double(eachBid.quantity)!, orderBookType: OrderBook.OrderBookType.bid))
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachBid.price)!*100000)/100000, amount: round(Double(eachBid.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.bid))
                         }
                     }
-                    print(self.registeredOrders)
                     self.createOrderBookContents()
                     self.spinnerForOrderBook.stopAnimating()
                     
                 case .failure(let error):
                     print(error)
+                    self.displayErrorForOrderBooks(errormessage: error.errorDescription ?? "Error")
+                    
                 }
             }
         }
@@ -367,7 +368,6 @@ class ViewController: UIViewController {
         if currencyTableView.isEditing {
             editButton.setTitle("✕", for: .normal)
         } else {
-            // reset the contents of selectedRows array if the user stops editing without deleting
             editButton.setTitle("Edit", for: .normal)
         }
     }
@@ -516,7 +516,9 @@ class ViewController: UIViewController {
     }
     
     private func createOrderBookContents() {
-        for order in registeredOrders {
+        // registeredOrders from API are not sorted by price
+        let sortedRegisteredOrders = registeredOrders.sorted { $1.price < $0.price }
+        for order in sortedRegisteredOrders {
 
             let orderBookCellSV = UIStackView()
             orderBookCellSV.translatesAutoresizingMaskIntoConstraints = false
@@ -548,6 +550,22 @@ class ViewController: UIViewController {
             orderBookCellSV.addArrangedSubview(eachPriceLabel)
             orderBookCellSV.addArrangedSubview(bidAmountLabel)
         }
+    }
+    
+    private func removeOrderBooks() {
+        let subviews = orderBookChartContainer.subviews
+        for subview in subviews {
+            subview.removeFromSuperview()
+        }
+    }
+    
+    private func displayErrorForOrderBooks(errormessage: String) {
+        let errorMessageLabel = UILabel()
+        errorMessageLabel.translatesAutoresizingMaskIntoConstraints = false
+        errorMessageLabel.textColor = .white
+        errorMessageLabel.numberOfLines = 0
+        errorMessageLabel.text = errormessage
+        orderBookChartContainer.addArrangedSubview(errorMessageLabel)
     }
 }
 
@@ -595,6 +613,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             switchTableViewDisplay()
         }
         selectedCurrency = registeredCurrencies[indexPath.row]
+        // fetch new orderbook for the selected currency
         fetchOrderBook()
     }
     
