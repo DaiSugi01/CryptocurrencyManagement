@@ -227,7 +227,6 @@ class ViewController: UIViewController {
     
     var registeredCurrencies = [Cryptocurrency]()
     var selectedCurrency: Cryptocurrency?
-    var notEditingState = true
     var registeredOrders = [OrderBook]()
     weak var timer: Timer?
     
@@ -403,8 +402,6 @@ class ViewController: UIViewController {
         currencyTableView.allowsMultipleSelection = true
         currencyTableView.allowsMultipleSelectionDuringEditing = true
         currencyTableView.setEditing(!currencyTableView.isEditing, animated: true)
-        // disable modal dismissal during editing
-        notEditingState = !currencyTableView.isEditing
         // show delete button during editing
         deleteButton.isHidden = !currencyTableView.isEditing
         if currencyTableView.isEditing {
@@ -673,7 +670,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // when not in editing mode
-        if notEditingState {
+        if !currencyTableView.isEditing {
             switchTableViewDisplay()
             selectedCurrency = registeredCurrencies[indexPath.row]
             // fetch new orderbook for the selected currency
