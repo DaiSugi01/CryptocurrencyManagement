@@ -9,7 +9,7 @@ import Foundation
 struct Cryptocurrency: Codable, Equatable {
     var name: String
     var symbol: String
-    var realTimeRate: Double
+    var realTimeRate: Double?
     var lowPrice: Double?
     var highPrice: Double?
     var image: String

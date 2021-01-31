@@ -107,7 +107,7 @@ class AddEditCurrencyViewController: UIViewController {
         bt.backgroundColor = .white
         bt.setTitleColor(.black, for: .normal)
         bt.backgroundColor = .gray
-        bt.setTitle("Fetching...", for: .normal)
+        bt.setTitle("", for: .normal)
         bt.isEnabled = false
         bt.addTarget(self, action: #selector(currencyNameButtonTapped(_:)), for: .touchUpInside)
         bt.layer.cornerRadius = 5.0
@@ -238,7 +238,7 @@ class AddEditCurrencyViewController: UIViewController {
     let realTimeRate: UILabel = {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.text = "$ 45,970.94"
+        lb.text = ""
         lb.font = .monospacedDigitSystemFont(ofSize: 17, weight: .bold)
         lb.textColor = UIColor(hex: "1DC7AC")
         return lb
@@ -251,13 +251,41 @@ class AddEditCurrencyViewController: UIViewController {
         return lc
     }()
     
+    var fetchedRealTimeRate: Double? = nil {
+        willSet(newRate) {
+            guard let newRate = newRate else { return }
+            
+            if fetchedRealTimeRate == nil {
+                self.realTimeRate.textColor = UIColor(hex: "1DC7AC")
+                self.realTimeRate.text = "$ \(newRate)"
+            } else {
+                guard let prevRate = fetchedRealTimeRate else { return }
+                UIView.animate(withDuration: 0.2, animations: {
+                    self.realTimeRate.textColor = newRate > prevRate ? UIColor(hex: "1DC7AC") : UIColor(hex: "FF3B30")
+                    self.realTimeRate.text = "$ \(newRate)"
+                    
+                    let translateTransform = CGAffineTransform(translationX: 0, y: 2)
+                    self.realTimeRate.transform = translateTransform
+                }, completion: { (_) in
+                    UIView.animate(withDuration: 0.2) {
+                        self.realTimeRate.transform = .identity
+                    }
+                })
+            }
+        }
+    }
+    weak var timer: Timer?
     var currencyInfo: Cryptocurrency?
     var currencies = [""]
     var isPickerHidden = true
     var delegate: AddEditCurrencyInfoDelegate?
-    var currency: [String: String] = [String: String]()
     var registeredCurrency = [String]()
     
+    // Currency information to show table on main screen
+    var selectedCurrencyName = ""
+    var selectedCurrencySymbol = ""
+    var selectedCurrencyImage = ""
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setDelegates()
@@ -294,6 +322,40 @@ class AddEditCurrencyViewController: UIViewController {
         highPriceTF.delegate = self
     }
     
+    private func startTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
+            self.fetchRealTimeRate()
+        }
+    }
+    
+    private func stopTimer() {
+        timer?.invalidate()
+    }
+
+    private func fetchRealTimeRate() {
+        let currencySymbolsString = currencyNameButton.currentTitle!
+        if currencySymbolsString.isEmpty { return }
+        
+        CurrencyAPI.shared.fetchCryptocurrencyFromNomics(currencySymbols: currencySymbolsString) { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currency):
+                    self.fetchedRealTimeRate = Double(currency.first!.price)
+
+                    if let currency = currency.first {
+                        self.selectedCurrencyName = currency.name
+                        self.selectedCurrencySymbol = currency.symbol
+                        self.selectedCurrencyImage = currency.logo_url
+                    }
+                case .failure(let error):
+                    print(error)
+                    self.createDialogMessage(messageType: .error)
+                }
+            }
+        }
+    }
+    
     private func getCurrencyList() {
         CurrencyAPI.shared.fetchCurrencyList { (result) in
             DispatchQueue.main.async {
@@ -301,14 +363,13 @@ class AddEditCurrencyViewController: UIViewController {
                 case .success(let currencyInfo):
                     for currency in currencyInfo.data {
                         if !self.registeredCurrency.contains(currency.symbol) {
-                            self.currency[currency.symbol] = currency.name
                             self.currencies.append(currency.symbol)
                         }
                     }
                     self.makeCurrencyButtonEnabled(titleText: "")
                 case .failure(let error):
                     print(error)
-                    self.createDialogMessage()
+                    self.createDialogMessage(messageType: .error)
                 }
             }
         }
@@ -326,7 +387,7 @@ class AddEditCurrencyViewController: UIViewController {
                     self.lineChart.setLineGraph(values: values)
                 case .failure(let error):
                     print(error)
-                    self.createDialogMessage()
+                    self.createDialogMessage(messageType: .error)
                 }
             }
         }
@@ -338,10 +399,11 @@ class AddEditCurrencyViewController: UIViewController {
         currencyNameButton.isEnabled = true
     }
 
-    private func makeCurrencyButtonInvalid(titleText: String) {
-        currencyNameButton.setTitle(titleText, for: .normal)
-        currencyNameButton.backgroundColor = .gray
-        currencyNameButton.isEnabled = false
+//    private func makeCurrencyButtonInvalid(titleText: String, button: UIButton) {
+    private func makeButtonInvalid(titleText: String, button: UIButton) {
+        button.setTitle(titleText, for: .normal)
+        button.backgroundColor = .gray
+        button.isEnabled = false
     }
 
     private func setupUI() {
@@ -464,12 +526,16 @@ class AddEditCurrencyViewController: UIViewController {
         }
         
         // make currencyNameButton invalid
-        makeCurrencyButtonInvalid(titleText: currencyInfo!.symbol)
+        makeButtonInvalid(titleText: currencyInfo!.symbol, button: currencyNameButton)
+        
+        // set real time rate
+        fetchRealTimeRate()
+        startTimer()
         
         // set chart
         getChartData(currencySymbol: currencyInfo!.symbol)
     }
-    
+        
     private func isEnableSaveButton() -> Bool{
         var isTextFieldValidPass = true
         if lowPriceTF.text != "" || highPriceTF.text != "" {
@@ -494,6 +560,8 @@ class AddEditCurrencyViewController: UIViewController {
     private func hiddenPicker() {
         if currencyPicker.isHidden { return }
         
+        realTimeRate.text = "Fetching..."
+        fetchedRealTimeRate = nil
         UIView.animate(withDuration: 0.1) {
             self.currencyPicker.isHidden = true
         }
@@ -501,7 +569,10 @@ class AddEditCurrencyViewController: UIViewController {
         guard let currencyName = currencyNameButton.currentTitle else { return }
         
         if !currencyName.isEmpty {
+            stopTimer()
             getChartData(currencySymbol: currencyName)
+            fetchRealTimeRate()
+            startTimer()
             lineChart.isHidden = false
         } else {
             lineChart.isHidden = true
@@ -518,12 +589,26 @@ class AddEditCurrencyViewController: UIViewController {
         }
     }
     
-    private func createDialogMessage() {
-        let dialogMessage = UIAlertController(title: "", message: "Sorry, we couldn't fetch data.\n Please try again", preferredStyle: .alert)
-        let wrong = UIAlertAction(title: "Dissmiss", style: .cancel, handler: { (_) -> Void in
-            self.dismiss(animated: true, completion: nil)
-        })
-        dialogMessage.addAction(wrong)
+    private func createDialogMessage(messageType: Message) {
+        var title: String
+        var message: String
+        var action: UIAlertAction
+        
+        switch messageType {
+        case .error:
+            title = "Error"
+            message = "Sorry, we couldn't fetch data.\n Please try again"
+            action = UIAlertAction(title: "Dissmiss", style: .cancel, handler: { (_) -> Void in
+                self.dismiss(animated: true, completion: nil)
+            })
+        case .warning:
+            title = "Warning"
+            message = "Sorry, fetched data is not available yet. \nPlease try again"
+            action = UIAlertAction(title: "OK", style: .cancel, handler: { (_) -> Void in
+            })
+        }
+        let dialogMessage = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        dialogMessage.addAction(action)
         self.present(dialogMessage, animated: true, completion: nil)
     }
 }
@@ -558,32 +643,42 @@ extension AddEditCurrencyViewController {
     }
     
     @objc private func saveButtonTapped() {
-        guard let currencySymbol = currencyNameButton.currentTitle else { return }
+        if fetchedRealTimeRate == nil {
+            createDialogMessage(messageType: .warning)
+            return
+        }
         
         let lowPrice: Double?
         lowPrice = !lowPriceTF.text!.isEmpty ? Double(lowPriceTF.text!) : nil
         let highPrice: Double?
         highPrice = !highPriceTF.text!.isEmpty ? Double(highPriceTF.text!) : nil
 
+        // Add Currency Screen
         if pageTitleLabel.text == "Add Currency" {
-            if let currencyName = currency[currencySymbol] {
-                delegate?.save(currency: Cryptocurrency(name: currencyName, symbol: currencySymbol, realTimeRate: 100.0, lowPrice: lowPrice, highPrice: highPrice, image: ""))
-            }
+            delegate?.save(currency: Cryptocurrency(name: selectedCurrencyName,
+                                                    symbol: selectedCurrencySymbol,
+                                                    realTimeRate: fetchedRealTimeRate!,
+                                                    lowPrice: lowPrice,
+                                                    highPrice: highPrice,
+                                                    image: selectedCurrencyImage))
         } else {
+            // Edit Currency Screen
             let currencyName = currencyInfo!.name
             let symbol = currencyInfo!.symbol
             delegate?.edit(currency: Cryptocurrency(
                             name: currencyName,
                             symbol: symbol,
-                            realTimeRate: 110.0,
+                            realTimeRate: fetchedRealTimeRate!,
                             lowPrice: lowPrice,
                             highPrice: highPrice,
                             image: ""))
         }
+        stopTimer()
         dismiss(animated: true, completion: nil)
     }
     
     @objc private func cancelButtonTapped() {
+        stopTimer()
         dismiss(animated: true, completion: nil)
     }
     

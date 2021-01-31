@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0AF6B625C6200300459BDE /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0AF6B525C6200300459BDE /* Message.swift */; };
 		0A10E54325B576B000A45C3E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A10E54225B576B000A45C3E /* AppDelegate.swift */; };
 		0A10E54525B576B000A45C3E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A10E54425B576B000A45C3E /* SceneDelegate.swift */; };
 		0A10E54725B576B000A45C3E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A10E54625B576B000A45C3E /* ViewController.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A0AF6B525C6200300459BDE /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		0A10E53F25B576B000A45C3E /* Cryptocurrency Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cryptocurrency Management.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A10E54225B576B000A45C3E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0A10E54425B576B000A45C3E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				61E532DC25BFC8570036F91E /* OrderBook.swift */,
 				0A7A3E7325C263B00081A7E6 /* CurrencyAPIKey.swift */,
 				61CB0D0F25C37FD700AC714B /* CurrencyRealTimeRate.swift */,
+				0A0AF6B525C6200300459BDE /* Message.swift */,
 				6151244625C5553E009569A5 /* OrderbookContents.swift */,
 			);
 			path = Models;
@@ -286,6 +289,7 @@
 				0A7A3E7425C263B00081A7E6 /* CurrencyAPIKey.swift in Sources */,
 				618AF01825B64A0400C68DB4 /* AddEditCurrencyViewController.swift in Sources */,
 				0A10E54525B576B000A45C3E /* SceneDelegate.swift in Sources */,
+				0A0AF6B625C6200300459BDE /* Message.swift in Sources */,
 				6151244225C51335009569A5 /* CurrencyTableViewCell.swift in Sources */,
 				617623EF25C4153B00FDE343 /* UIImage.swift in Sources */,
 			);
