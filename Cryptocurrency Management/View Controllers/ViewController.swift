@@ -221,7 +221,7 @@ class ViewController: UIViewController {
     let defaults = UserDefaults.standard
     
     var registeredCurrencies = [Cryptocurrency]()
-    var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil, image: "")
+    var selectedCurrency: Cryptocurrency?
     var allowDissmissModal = true
     var registeredOrders = [OrderBook]()
     weak var timer: Timer?
@@ -234,6 +234,7 @@ class ViewController: UIViewController {
         createOrderBookContents()
         fetchRealTimeRate()
         startTimer()
+        print("selectedCurrency: \(selectedCurrency)")
     }
     
     private func startTimer() {
@@ -279,6 +280,8 @@ class ViewController: UIViewController {
     }
     
     private func fetchOrderBook() {
+        guard let selectedCurrency = selectedCurrency else { return  }
+        
         CurrencyAPI.shared.fetchOrderbookFromShrimpy(targetCurrency: selectedCurrency.symbol)  { (result) in
             DispatchQueue.main.async {
                 self.spinnerForOrderBook.startAnimating()
@@ -312,9 +315,13 @@ class ViewController: UIViewController {
             let decoder = JSONDecoder()
             if let loadedCurrencyList = try? decoder.decode([Cryptocurrency].self, from: savedCurrencyList) {
                 registeredCurrencies = loadedCurrencyList
+                if registeredCurrencies.count > 0 {
+                    selectedCurrency = registeredCurrencies.first
+                }
             }
-        } else {
-            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", realTimeRate: 45497.94, lowPrice: nil, highPrice: nil, image: "")]
+        }
+        if registeredCurrencies.count == 0 {
+            registeredCurrencies = [Cryptocurrency(name: "Bitcoin", symbol: "BTC", realTimeRate: nil, lowPrice: nil, highPrice: nil, image: "https://s3.us-east-2.amazonaws.com/nomics-api/static/images/currencies/btc.svg")]
         }
     }
     
@@ -381,6 +388,7 @@ class ViewController: UIViewController {
             registeredCurrencies.remove(at: indexPath.row)
         }
         currencyTableView.reloadData()
+        saveCurrencyListToLocal()
     }
     
     private var bottomConstraint = NSLayoutConstraint()
@@ -580,7 +588,11 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.textLabel?.textColor = UIColor(hex: "#858EC5")
         cell.textLabel?.text = registeredCurrencies[indexPath.row].name
         cell.textLabel?.font = .boldSystemFont(ofSize: 17)
-        cell.detailTextLabel?.text = "$ \(registeredCurrencies[indexPath.row].realTimeRate)"
+        if let registeredRealTimeRate = registeredCurrencies[indexPath.row].realTimeRate {
+            cell.detailTextLabel?.text = "$ \(registeredRealTimeRate)"
+        } else {
+            cell.detailTextLabel?.text = "fetching..."
+        }
         cell.detailTextLabel?.textColor = UIColor(hex: "#1DC7AC")
         
         for currency in registeredCurrencies {
@@ -682,6 +694,7 @@ extension ViewController: AddEditCurrencyInfoDelegate {
     func edit(currency: Cryptocurrency) {
         if let index = registeredCurrencies.firstIndex(of: currency) {
             registeredCurrencies[index] = currency
+            selectedCurrency = currency
         }
         saveCurrencyListToLocal()
         currencyTableView.reloadData()
