@@ -44,6 +44,7 @@ class CurrencyAPI {
     func fetchOrderbookFromShrimpy(targetCurrency: String, completion: @escaping (Result<[OrderbookContents], NetworkError>) -> Void) {
         var urlComponents = URLComponents(string: Endpoint.Shrimpy.orderbookUrl)!
         urlComponents.queryItems = [
+            Parameter.Shrimpy.apiKey: CurrencyAPIKey.shrimpyPrivateApiKey,
             Parameter.Shrimpy.exchange: "Bittrex",
             Parameter.Shrimpy.targetCurrency: targetCurrency,
             Parameter.Shrimpy.priceIn: "USDT",
@@ -147,6 +148,7 @@ class CurrencyAPI {
         }
         
         struct Shrimpy {
+            static let apiKey = "apiKey"
             static let exchange = "exchange"
             static let targetCurrency = "baseSymbol"
             static let priceIn = "quoteSymbol"

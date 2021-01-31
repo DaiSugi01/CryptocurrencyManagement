@@ -679,7 +679,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         selectedCurrency = registeredCurrencies[indexPath.row]
         // fetch new orderbook for the selected currency
         fetchOrderBook()
-        getChartData(currencySymbol: selectedCurrency.symbol)
+        getChartData(currencySymbol: selectedCurrency!.symbol)
     }
     
     // swipe delete
