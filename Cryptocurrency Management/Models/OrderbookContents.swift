@@ -10,8 +10,21 @@ import Foundation
 struct OrderbookContents: Codable {
     let baseSymbol: String  // target currency
     let quoteSymbol: String  // the price of the target currency is shown in this currency
-//    let orderBooks: [String: String] // exchange and orderBook
-//    let orderBook: String
-//    let asks: [String: String]
-//    let bids: [String: String]
+    let orderBooks: [OrderBooks]
+    struct OrderBooks: Codable {
+        let exchange: String
+        let orderBook: OrderBook
+        struct OrderBook: Codable {
+          let asks: [Ask]
+          let bids: [Bid]
+          struct Ask: Codable {
+            let price: String
+            let quantity: String
+          }
+          struct Bid: Codable {
+            let price: String
+            let quantity: String
+          }
+        }
+      }
 }

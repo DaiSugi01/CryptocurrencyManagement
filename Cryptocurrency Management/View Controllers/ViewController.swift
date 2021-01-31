@@ -303,9 +303,13 @@ class ViewController: UIViewController {
                 switch result {
                 case .success(let orderbookInfo):
                     print("orderbookInfo \(orderbookInfo)")
+//                    print(orderbookInfo[Cryptocurrency_Management.OrderbookContents.OrderBooks[Cryptocurrency_Management.OrderbookContents.OrderBooks.OrderBook[Cryptocurrency_Management.OrderbookContents.OrderBooks.OrderBook.Ask]]])
+//                    print(orderbookInfo[Cryptocurrency_Management.OrderbookContents.OrderBooks.OrderBook.Ask])
+//                    for ask in orderbookInfo[Cryptocurrency_Management.OrderbookContents.OrderBooks.OrderBook] {
+//                        print(ask.price)
+//                    }
                 case .failure(let error):
                     print(error)
-                    print("orderbookInfo error")
                 }
             }
         }
