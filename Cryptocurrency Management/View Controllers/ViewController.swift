@@ -79,7 +79,6 @@ class ViewController: UIViewController {
     let chartContainer: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
-//        v.backgroundColor = .green
         return v
     }()
     let orderBookContainer: UIStackView = {
