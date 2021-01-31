@@ -79,7 +79,6 @@ class ViewController: UIViewController {
     let chartContainer: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .white
         return v
     }()
     let orderBookContainer: UIStackView = {
@@ -217,6 +216,12 @@ class ViewController: UIViewController {
         tv.backgroundColor = .gray
         return tv
     }()
+    let lineChart: CustomLineChartView = {
+        let lc = CustomLineChartView()
+        lc.translatesAutoresizingMaskIntoConstraints = false
+        lc.noDataText = ""
+        return lc
+    }()
     
     let defaults = UserDefaults.standard
     
@@ -325,6 +330,25 @@ class ViewController: UIViewController {
         }
     }
     
+    private func getChartData(currencySymbol: String) {
+        CurrencyAPI.shared.fetchCurrencyPriceTimeSeries(currency: currencySymbol) { (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let currencyInfo):
+                    var values = [Double]()
+                    for currency in currencyInfo.data.values {
+                        values.append(currency[1])
+                    }
+                    self.lineChart.setLineGraph(values: values)
+                    self.spinnerForChart.stopAnimating()
+                case .failure(let error):
+                    print(error)
+                    self.createDialogMessage()
+                }
+            }
+        }
+    }
+    
     func setDelegate() {
         /********************** App ***********************/
         NotificationCenter.default.addObserver(
@@ -411,6 +435,7 @@ class ViewController: UIViewController {
         // spinner  // spinnerForChart
         spinnerForChart.startAnimating()
         spinnerForChart.translatesAutoresizingMaskIntoConstraints = false
+        spinnerForChart.color = UIColor(hex: "#FF2E63")
         // spinnerForCurrencyList
         spinnerForCurrencyList.startAnimating()
         spinnerForCurrencyList.translatesAutoresizingMaskIntoConstraints = false
@@ -434,6 +459,7 @@ class ViewController: UIViewController {
 
         view.addSubview(chartContainer)
         chartContainer.addSubview(spinnerForChart)
+        chartContainer.addSubview(lineChart)
         
         view.addSubview(orderBookContainer)
         orderBookContainer.addArrangedSubview(orderBookContainerHeaderSV)
@@ -475,6 +501,11 @@ class ViewController: UIViewController {
             chartContainer.topAnchor.constraint(equalTo: rootHeaderSV.bottomAnchor, constant: 10),
             chartContainer.widthAnchor.constraint(equalTo: view.widthAnchor),
             chartContainer.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.28),
+            
+            lineChart.leadingAnchor.constraint(equalTo: chartContainer.leadingAnchor),
+            lineChart.topAnchor.constraint(equalTo: chartContainer.topAnchor),
+            lineChart.widthAnchor.constraint(equalTo: chartContainer.widthAnchor),
+            lineChart.heightAnchor.constraint(equalTo: chartContainer.heightAnchor),
             
             spinnerForChart.centerXAnchor.constraint(equalTo: chartContainer.centerXAnchor),
             spinnerForChart.centerYAnchor.constraint(equalTo: chartContainer.centerYAnchor),
@@ -587,6 +618,15 @@ class ViewController: UIViewController {
         errorMessageLabel.text = errormessage
         orderBookChartContainer.addArrangedSubview(errorMessageLabel)
     }
+    
+    private func createDialogMessage() {
+        let dialogMessage = UIAlertController(title: "", message: "Sorry, we couldn't fetch data.\n Please try again", preferredStyle: .alert)
+        let wrong = UIAlertAction(title: "Dissmiss", style: .cancel, handler: { (_) -> Void in
+            self.dismiss(animated: true, completion: nil)
+        })
+        dialogMessage.addAction(wrong)
+        self.present(dialogMessage, animated: true, completion: nil)
+    }
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
@@ -639,6 +679,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         selectedCurrency = registeredCurrencies[indexPath.row]
         // fetch new orderbook for the selected currency
         fetchOrderBook()
+        getChartData(currencySymbol: selectedCurrency.symbol)
     }
     
     // swipe delete
