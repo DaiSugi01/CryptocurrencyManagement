@@ -75,6 +75,7 @@ class ViewController: UIViewController {
     }()
     let spinnerForChart = UIActivityIndicatorView(style: .large)
     let spinnerForCurrencyList = UIActivityIndicatorView(style: .large)
+    let spinnerForOrderBook = UIActivityIndicatorView(style: .large)
     let chartContainer: UIView = {
         let v = UIView()
         v.translatesAutoresizingMaskIntoConstraints = false
@@ -222,28 +223,7 @@ class ViewController: UIViewController {
     var registeredCurrencies = [Cryptocurrency]()
     var selectedCurrency = Cryptocurrency(name: "BTC", symbol: "BitCoin", realTimeRate: 0, lowPrice: nil, highPrice: nil, image: "")
     var allowDissmissModal = true
-    var registeredOrders: [OrderBook] = [
-        OrderBook(currencyName: "Bitcoin", price: 4050.0, amount: 100, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4100.0, amount: 200, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4150.0, amount: 300, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4200.0, amount: 400, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4250.0, amount: 500, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4300.0, amount: 600, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4350.0, amount: 700, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4400.0, amount: 800, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4450.0, amount: 900, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4500.0, amount: 1000, orderBookType: OrderBook.OrderBookType.bid),
-        OrderBook(currencyName: "Bitcoin", price: 4550.0, amount: 1000, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4600.0, amount: 900, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4650.0, amount: 800, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4700.0, amount: 700, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4750.0, amount: 600, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4800.0, amount: 500, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4850.0, amount: 400, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4900.0, amount: 300, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 4950.0, amount: 200, orderBookType: OrderBook.OrderBookType.ask),
-        OrderBook(currencyName: "Bitcoin", price: 5000.0, amount: 100, orderBookType: OrderBook.OrderBookType.ask)
-    ]
+    var registeredOrders = [OrderBook]()
     weak var timer: Timer?
     
     override func viewDidLoad() {
@@ -252,12 +232,13 @@ class ViewController: UIViewController {
         setDelegate()
         setupLayout()
         createOrderBookContents()
+        fetchRealTimeRate()
         startTimer()
     }
     
     private func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
             self.fetchRealTimeRate()
         }
     }
@@ -292,6 +273,35 @@ class ViewController: UIViewController {
                     self.spinnerForCurrencyList.stopAnimating()
                 case .failure(let error):
                     print(error)
+                }
+            }
+        }
+    }
+    
+    private func fetchOrderBook() {
+        CurrencyAPI.shared.fetchOrderbookFromShrimpy(targetCurrency: selectedCurrency.symbol)  { (result) in
+            DispatchQueue.main.async {
+                self.spinnerForOrderBook.startAnimating()
+                // reset the previous orderbook contents from the view
+                self.removeOrderBooks()
+                self.registeredOrders.removeAll()
+                switch result {
+                case .success(let orderbookInfo):
+                    for eachOrderBook in orderbookInfo.first!.orderBooks {
+                        for eachAsk in eachOrderBook.orderBook.asks {
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachAsk.price)!*100000)/100000, amount: round(Double(eachAsk.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.ask))
+                        }
+                        for eachBid in eachOrderBook.orderBook.bids {
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachBid.price)!*100000)/100000, amount: round(Double(eachBid.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.bid))
+                        }
+                    }
+                    self.createOrderBookContents()
+                    self.spinnerForOrderBook.stopAnimating()
+                    
+                case .failure(let error):
+                    print(error)
+                    self.displayErrorForOrderBooks(errormessage: error.errorDescription ?? "Error")
+                    
                 }
             }
         }
@@ -358,7 +368,6 @@ class ViewController: UIViewController {
         if currencyTableView.isEditing {
             editButton.setTitle("✕", for: .normal)
         } else {
-            // reset the contents of selectedRows array if the user stops editing without deleting
             editButton.setTitle("Edit", for: .normal)
         }
     }
@@ -386,6 +395,10 @@ class ViewController: UIViewController {
         spinnerForCurrencyList.startAnimating()
         spinnerForCurrencyList.translatesAutoresizingMaskIntoConstraints = false
         spinnerForCurrencyList.color = UIColor(hex: "#FF2E63")
+        // spinnerForOrderBook
+        spinnerForOrderBook.startAnimating()
+        spinnerForOrderBook.translatesAutoresizingMaskIntoConstraints = false
+        spinnerForOrderBook.color = UIColor(hex: "#FF2E63")
         
         // currencyTableView
         currencyTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellId)
@@ -411,6 +424,7 @@ class ViewController: UIViewController {
         orderBookContainerHeaderLowerSV.addArrangedSubview(bidLabel)
         orderBookContainer.addArrangedSubview(orderBookScrollView)
         orderBookScrollView.addSubview(orderBookChartContainer)
+        orderBookChartContainer.addSubview(spinnerForOrderBook)
         
         // addSubView in main page
         view.addSubview(popupView)
@@ -467,6 +481,9 @@ class ViewController: UIViewController {
             orderBookChartContainer.bottomAnchor.constraint(equalTo: orderBookScrollView.contentLayoutGuide.bottomAnchor),
             orderBookChartContainer.leadingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.leadingAnchor),
             orderBookChartContainer.trailingAnchor.constraint(equalTo: orderBookScrollView.frameLayoutGuide.trailingAnchor),
+            
+            spinnerForOrderBook.centerXAnchor.constraint(equalTo: orderBookChartContainer.centerXAnchor),
+            spinnerForOrderBook.centerYAnchor.constraint(equalTo: orderBookChartContainer.centerYAnchor, constant: 100),
                         
             tableHeaderSV.topAnchor.constraint(equalTo: popupView.safeAreaLayoutGuide.topAnchor, constant: 15),
             tableHeaderSV.heightAnchor.constraint(equalTo: headerWrapper.heightAnchor, multiplier: 0.7),
@@ -499,9 +516,9 @@ class ViewController: UIViewController {
     }
     
     private func createOrderBookContents() {
-        // may have to be deleted later
-        let sortedRegisteredCurrencies = registeredOrders.sorted { $1.price < $0.price }
-        for order in sortedRegisteredCurrencies {
+        // registeredOrders from API are not sorted by price
+        let sortedRegisteredOrders = registeredOrders.sorted { $1.price < $0.price }
+        for order in sortedRegisteredOrders {
 
             let orderBookCellSV = UIStackView()
             orderBookCellSV.translatesAutoresizingMaskIntoConstraints = false
@@ -533,6 +550,22 @@ class ViewController: UIViewController {
             orderBookCellSV.addArrangedSubview(eachPriceLabel)
             orderBookCellSV.addArrangedSubview(bidAmountLabel)
         }
+    }
+    
+    private func removeOrderBooks() {
+        let subviews = orderBookChartContainer.subviews
+        for subview in subviews {
+            subview.removeFromSuperview()
+        }
+    }
+    
+    private func displayErrorForOrderBooks(errormessage: String) {
+        let errorMessageLabel = UILabel()
+        errorMessageLabel.translatesAutoresizingMaskIntoConstraints = false
+        errorMessageLabel.textColor = .white
+        errorMessageLabel.numberOfLines = 0
+        errorMessageLabel.text = errormessage
+        orderBookChartContainer.addArrangedSubview(errorMessageLabel)
     }
 }
 
@@ -580,6 +613,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             switchTableViewDisplay()
         }
         selectedCurrency = registeredCurrencies[indexPath.row]
+        // fetch new orderbook for the selected currency
+        fetchOrderBook()
     }
     
     // swipe delete
