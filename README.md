@@ -24,11 +24,11 @@ APIEndpoint: https://dev-api.shrimpy.io/v1/orderbooks?exchange=bittrex&baseSymb
 
 2. Nomics -- Realtime rate
 API document : https://nomics.com/docs/#operation/getCurrenciesTicker
-APIEndpoint: https://api.nomics.com/v1/currencies/ticker?key=4a839bdacf57ee3f1bce0e2a5125f828&ids=BTC,ETH,XRP&interval=1d&convert=CAD&per-page=100&page=1
+APIEndpoint: https://api.nomics.com/v1/currencies/ticker?key={API_KEY}&ids=BTC,ETH,XRP&interval=1d&convert=CAD&per-page=100&page=1
 
 3. Messari -- Previous rates (for chart)
 API document : https://messari.io/api/docs#operation/Get%20all%20Assets%20V2
-APIEndpoint: https://data.messari.io/api/v1/assets/{currencyName}/metrics/price/time-series
+APIEndpoint: https://data.messari.io/api/v1/assets/{CURRENCY_NAME}/metrics/price/time-series
 
 4. Messari -- Coin name list (for select box)
 API document : https://messari.io/api/docs#operation/Get%20all%20Assets%20V2
