@@ -55,6 +55,17 @@ class CurrencyAPI {
         }
     }
     
+    func fetchCurrencyConvertRateAgainstUSD(completion: @escaping (Result<ExchangeRateAgainstUSD, NetworkError>) -> Void) {
+        var urlComponents = URLComponents(string: Endpoint.Exchangerates.exchangerateUrl)!
+        urlComponents.queryItems = [
+            Parameter.Exchangerates.baseCurrency: "USD"
+        ].map { URLQueryItem(name: $0.key, value: $0.value) }
+        
+        fetch(from: urlComponents.url!) { (result: Result<ExchangeRateAgainstUSD, NetworkError>) in
+            completion(result)
+        }
+    }
+    
     func fetchCurrencyPriceTimeSeries(currency: String, completion: @escaping (Result<CurrencyPriceTimeSeries, NetworkError>) -> Void) {
         
         // current date
@@ -128,6 +139,10 @@ class CurrencyAPI {
         struct Shrimpy {
             static let orderbookUrl = "https://dev-api.shrimpy.io/v1/orderbooks"
         }
+        
+        struct Exchangerates {
+            static let exchangerateUrl = "https://api.exchangeratesapi.io/latest"
+        }
     }
     
     struct Parameter {
@@ -151,6 +166,10 @@ class CurrencyAPI {
             static let targetCurrency = "baseSymbol"
             static let priceIn = "quoteSymbol"
             static let maxNum = "limit"
+        }
+        
+        struct Exchangerates {
+            static let baseCurrency = "base"
         }
     }
     
