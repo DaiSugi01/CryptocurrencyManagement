@@ -233,7 +233,6 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchUSDIntoCADRate()
         setCurrencyListFromLocal()
         setDelegate()
         setupLayout()
