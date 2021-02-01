@@ -31,7 +31,7 @@ API document : https://messari.io/api/docs#operation/Get%20all%20Assets%20V2
 APIEndpoint: https://data.messari.io/api/v1/assets/{CURRENCY_NAME}/metrics/price/time-series
 
 4. Messari -- Coin name list (for select box)
-API document : https://messari.io/api/docs#operation/Get%20all%20Assets%20V2
+API document : https://messari.io/api/docs#operation/Get%20all%20Assets%20V2 
 APIEndpoint: https://data.messari.io/api/v2/assets
 
 5. Foreign exchange rates API -- Convert USD orderbook prices into CAD
