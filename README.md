@@ -1,5 +1,5 @@
 # CryptocurrencyManagement
-
+![CryptocurrencyManagement](https://user-images.githubusercontent.com/37020406/106434608-a550c180-6426-11eb-9411-a9f61f3f73ef.gif)
 
 ## App description
 
