@@ -253,7 +253,6 @@ class ViewController: UIViewController {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
             self.fetchRealTimeRate()
-            self.fetchUSDIntoCADRate()
         }
     }
     
@@ -385,6 +384,13 @@ class ViewController: UIViewController {
             name: UIApplication.willTerminateNotification,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didBecomeActiveApp(_:)),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
     
     func saveCurrencyListToLocal() {
@@ -402,6 +408,11 @@ class ViewController: UIViewController {
     
     @objc func willTerminateApp(_ sender: UIApplication) {
         saveCurrencyListToLocal()
+    }
+    
+    @objc func didBecomeActiveApp(_ sender: UIApplication) {
+        print(#function)
+        fetchUSDIntoCADRate()
     }
     
     @objc func addCurrencyButtonTapped(_ sender: UIButton) {
