@@ -228,10 +228,12 @@ class ViewController: UIViewController {
     var registeredCurrencies = [Cryptocurrency]()
     var selectedCurrency: Cryptocurrency?
     var registeredOrders = [OrderBook]()
+    var rateUSDIntoCAD: Double = 0.0
     weak var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchUSDIntoCADRate()
         setCurrencyListFromLocal()
         setDelegate()
         setupLayout()
@@ -251,11 +253,25 @@ class ViewController: UIViewController {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
             self.fetchRealTimeRate()
+            self.fetchUSDIntoCADRate()
         }
     }
     
     private func stopTimer() {
         timer?.invalidate()
+    }
+    
+    private func fetchUSDIntoCADRate() {
+        CurrencyAPI.shared.fetchCurrencyConvertRateAgainstUSD(){ (result) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let exchangerateInfo):
+                    self.rateUSDIntoCAD = exchangerateInfo.rates.CAD
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
     }
     
     private func fetchRealTimeRate() {
@@ -302,10 +318,10 @@ class ViewController: UIViewController {
                 case .success(let orderbookInfo):
                     for eachOrderBook in orderbookInfo.first!.orderBooks {
                         for eachAsk in eachOrderBook.orderBook.asks {
-                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachAsk.price)!*100000)/100000, amount: round(Double(eachAsk.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.ask))
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(self.rateUSDIntoCAD * Double(eachAsk.price)! * 100000)/100000, amount: round(Double(eachAsk.quantity)! * 100000)/100000, orderBookType: OrderBook.OrderBookType.ask))
                         }
                         for eachBid in eachOrderBook.orderBook.bids {
-                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(Double(eachBid.price)!*100000)/100000, amount: round(Double(eachBid.quantity)!*100000)/100000, orderBookType: OrderBook.OrderBookType.bid))
+                            self.registeredOrders.append(OrderBook(currencyName: orderbookInfo.first!.baseSymbol, price: round(self.rateUSDIntoCAD * Double(eachBid.price)! * 100000)/100000, amount: round(Double(eachBid.quantity)! * 100000)/100000, orderBookType: OrderBook.OrderBookType.bid))
                         }
                     }
                     self.createOrderBookContents()
