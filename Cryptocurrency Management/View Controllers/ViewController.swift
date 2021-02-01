@@ -235,9 +235,16 @@ class ViewController: UIViewController {
         setCurrencyListFromLocal()
         setDelegate()
         setupLayout()
+        displayDefaultChartAndOrderBook()
         createOrderBookContents()
         fetchRealTimeRate()
         startTimer()
+    }
+    
+    private func displayDefaultChartAndOrderBook() {
+        // display chart and orderbok of the first currency in the registeredCurrencies list as a default
+        fetchOrderBook()
+        getChartData(currencySymbol: selectedCurrency!.symbol)
     }
     
     private func startTimer() {
