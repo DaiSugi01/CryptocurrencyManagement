@@ -356,7 +356,7 @@ class ViewController: UIViewController {
                 case .success(let currencyInfo):
                     var values = [Double]()
                     for currency in currencyInfo.data.values {
-                        values.append(currency[1])
+                        values.append(currency[1] * self.rateUSDIntoCAD)
                     }
                     self.lineChart.setLineGraph(values: values)
                     self.spinnerForChart.stopAnimating()
@@ -423,6 +423,7 @@ class ViewController: UIViewController {
         if !editCurrencyButton.isHidden {
             nextView.currencyInfo = selectedCurrency
         }
+        nextView.rateUSDIntoCAD = rateUSDIntoCAD
         present(nextView, animated: true, completion: nil)
     }
     

@@ -280,7 +280,8 @@ class AddEditCurrencyViewController: UIViewController {
     var isPickerHidden = true
     var delegate: AddEditCurrencyInfoDelegate?
     var registeredCurrency = [String]()
-    
+    var rateUSDIntoCAD: Double?
+
     // Currency information to show table on main screen
     var selectedCurrencyName = ""
     var selectedCurrencySymbol = ""
@@ -376,13 +377,14 @@ class AddEditCurrencyViewController: UIViewController {
     }
     
     private func getChartData(currencySymbol: String) {
+        guard let rateUSDIntoCAD = rateUSDIntoCAD else { return }
         CurrencyAPI.shared.fetchCurrencyPriceTimeSeries(currency: currencySymbol) { (result) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let currencyInfo):
                     var values = [Double]()
                     for currency in currencyInfo.data.values {
-                        values.append(currency[1])
+                        values.append(currency[1] * rateUSDIntoCAD)
                     }
                     self.lineChart.setLineGraph(values: values)
                 case .failure(let error):
