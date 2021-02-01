@@ -87,7 +87,14 @@ class CurrencyAPI {
         }
     }
     
+    var nonce = 0
     private func fetch<T: Decodable>(from url: URL, completion: @escaping (Result<T, NetworkError>) -> Void) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(CurrencyAPIKey.shrimpyPrivateApiKey, forHTTPHeaderField: "SHRIMPY-API-KEY")
+        nonce += 1
+        request.setValue("\(nonce)", forHTTPHeaderField: "DEV-SHRIMPY-API-NONCE")
+        
         dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard error == nil else {
                 completion(.failure(.client(message: "invalid request")))

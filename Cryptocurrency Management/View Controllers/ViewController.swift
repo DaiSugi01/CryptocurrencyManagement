@@ -227,7 +227,6 @@ class ViewController: UIViewController {
     
     var registeredCurrencies = [Cryptocurrency]()
     var selectedCurrency: Cryptocurrency?
-    var allowDissmissModal = true
     var registeredOrders = [OrderBook]()
     weak var timer: Timer?
     
@@ -236,15 +235,21 @@ class ViewController: UIViewController {
         setCurrencyListFromLocal()
         setDelegate()
         setupLayout()
+        displayDefaultChartAndOrderBook()
         createOrderBookContents()
         fetchRealTimeRate()
         startTimer()
-        print("selectedCurrency: \(selectedCurrency)")
+    }
+    
+    private func displayDefaultChartAndOrderBook() {
+        // display chart and orderbok of the first currency in the registeredCurrencies list as a default
+        fetchOrderBook()
+        getChartData(currencySymbol: selectedCurrency!.symbol)
     }
     
     private func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 11.0, repeats: true) { _ in
             self.fetchRealTimeRate()
         }
     }
@@ -404,8 +409,6 @@ class ViewController: UIViewController {
         currencyTableView.allowsMultipleSelection = true
         currencyTableView.allowsMultipleSelectionDuringEditing = true
         currencyTableView.setEditing(!currencyTableView.isEditing, animated: true)
-        // disable modal dismissal during editing
-        allowDissmissModal = !currencyTableView.isEditing
         // show delete button during editing
         deleteButton.isHidden = !currencyTableView.isEditing
         if currencyTableView.isEditing {
@@ -673,8 +676,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if allowDissmissModal {
+        // when not in editing mode
+        if !currencyTableView.isEditing {
             switchTableViewDisplay()
+            selectedCurrency = registeredCurrencies[indexPath.row]
+            // fetch new orderbook for the selected currency
+            fetchOrderBook()
+            getChartData(currencySymbol: selectedCurrency!.symbol)
         }
         selectedCurrency = registeredCurrencies[indexPath.row]
         // fetch new orderbook for the selected currency
