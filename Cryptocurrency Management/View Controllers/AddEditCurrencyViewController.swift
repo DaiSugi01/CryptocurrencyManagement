@@ -671,7 +671,7 @@ extension AddEditCurrencyViewController {
                             realTimeRate: fetchedRealTimeRate!,
                             lowPrice: lowPrice,
                             highPrice: highPrice,
-                            image: ""))
+                            image: selectedCurrencyImage))
         }
         stopTimer()
         dismiss(animated: true, completion: nil)
